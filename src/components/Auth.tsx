@@ -32,36 +32,36 @@ export function Auth() {
     };
 
     return (
-        <div className="flex flex-col items-center justify-center min-h-[400px]">
-            <div className="glass-panel p-8 rounded-3xl w-full max-w-md space-y-6">
+        <div className="flex flex-col items-center justify-center">
+            <div className="glass-panel p-8 rounded-3xl w-full max-w-md space-y-6 bg-white/80 shadow-xl border-slate-200">
                 <div className="text-center">
                     <h2 className="text-3xl font-bold gradient-text">
                         {isSignUp ? '加入 TravelDot' : '歡迎回來'}
                     </h2>
-                    <p className="text-slate-400 mt-2">
+                    <p className="text-slate-500 mt-2">
                         {isSignUp ? '開始紀錄您的全球足跡' : '繼續您的旅行故事'}
                     </p>
                 </div>
 
                 <form onSubmit={handleAuth} className="space-y-4">
                     <div>
-                        <label className="block text-sm font-medium text-slate-300 mb-1">電子郵件</label>
+                        <label className="block text-sm font-medium text-slate-600 mb-1">電子郵件</label>
                         <input
                             type="email"
                             value={email}
                             onChange={(e) => setEmail(e.target.value)}
-                            className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all"
+                            className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all text-slate-800 placeholder-slate-400"
                             placeholder="hello@example.com"
                             required
                         />
                     </div>
                     <div>
-                        <label className="block text-sm font-medium text-slate-300 mb-1">密碼</label>
+                        <label className="block text-sm font-medium text-slate-600 mb-1">密碼</label>
                         <input
                             type="password"
                             value={password}
                             onChange={(e) => setPassword(e.target.value)}
-                            className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all"
+                            className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all text-slate-800 placeholder-slate-400"
                             placeholder="••••••••"
                             required
                         />
@@ -70,14 +70,14 @@ export function Auth() {
                     <button
                         type="submit"
                         disabled={loading}
-                        className="w-full py-4 bg-indigo-600 hover:bg-indigo-500 disabled:opacity-50 transition-all rounded-xl font-bold text-lg shadow-lg shadow-indigo-500/20"
+                        className="w-full py-4 bg-indigo-600 hover:bg-indigo-700 disabled:opacity-50 transition-all rounded-xl font-bold text-lg text-white shadow-lg shadow-indigo-500/20"
                     >
                         {loading ? '處理中...' : isSignUp ? '立即註冊' : '登入帳號'}
                     </button>
                 </form>
 
                 {message && (
-                    <div className={`p-4 rounded-xl text-sm text-center ${message.includes('檢查') ? 'bg-emerald-500/10 text-emerald-400' : 'bg-rose-500/10 text-rose-400'}`}>
+                    <div className={`p-4 rounded-xl text-sm text-center ${message.includes('檢查') ? 'bg-emerald-50 text-emerald-600 border border-emerald-200' : 'bg-rose-50 text-rose-600 border border-rose-200'}`}>
                         {message}
                     </div>
                 )}
@@ -85,7 +85,7 @@ export function Auth() {
                 <div className="text-center pt-2">
                     <button
                         onClick={() => setIsSignUp(!isSignUp)}
-                        className="text-sm text-indigo-400 hover:text-indigo-300 font-medium"
+                        className="text-sm text-indigo-600 hover:text-indigo-700 font-medium hover:underline"
                     >
                         {isSignUp ? '已經有帳號了？點此登入' : '還沒有帳號？立即註冊'}
                     </button>
