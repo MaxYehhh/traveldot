@@ -75,3 +75,5 @@ npm run dev
 ## 🌐 部署方式
 
 專案已針對 **Vercel** 進行優化。提交代碼至 GitHub 後，可透過 Vercel Dashboard 匯入並設置對應的環境變數即可完成部署。
+
+**正式部署網址**: [https://traveldot-liard.vercel.app/](https://traveldot-liard.vercel.app/)
