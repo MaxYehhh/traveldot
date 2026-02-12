@@ -4,7 +4,7 @@ import { useAuthStore } from '@/stores/authStore'
 import { useTripStore } from '@/stores/tripStore'
 import { deletePlace as deletePlaceService } from '@/services/firestore'
 import { cn } from '@/lib/utils'
-import { ChevronRight, ChevronLeft, MapPin, Calendar, Image as ImageIcon, Plus, Trash2, LogOut, GripVertical } from 'lucide-react'
+import { ChevronRight, ChevronLeft, MapPin, Calendar, Image as ImageIcon, Trash2, LogOut, GripVertical } from 'lucide-react'
 import { toast } from 'sonner'
 
 export const Sidebar = () => {
@@ -94,28 +94,36 @@ export const Sidebar = () => {
                     isSidebarOpen ? "md:translate-x-0 md:translate-y-0" : "md:-translate-x-full md:translate-y-0"
                 )}
             >
-                {/* Header */}
-                <div className="p-4 border-b border-gray-100 flex items-center justify-between bg-white/50">
-                    <div>
-                        <h2 className="text-xl font-bold text-gray-800">儲存地點</h2>
-                        <p className="text-sm text-gray-500">{places.length} places</p>
+                {/* Header: Account Info */}
+                <div className="p-4 border-b border-gray-100 bg-white/50 flex items-center justify-between">
+                    <div className="flex items-center gap-3 min-w-0">
+                        <div className="w-9 h-9 rounded-full bg-blue-100 flex items-center justify-center text-blue-600 font-bold shrink-0">
+                            {currentUser?.email?.[0].toUpperCase() || 'U'}
+                        </div>
+                        <div className="min-w-0">
+                            <p className="text-sm font-semibold text-gray-900 truncate">{currentUser?.email}</p>
+                            <button
+                                onClick={() => logout()}
+                                className="text-xs text-gray-500 hover:text-red-600 flex items-center gap-1 transition-colors"
+                            >
+                                <LogOut size={12} />
+                                Sign out
+                            </button>
+                        </div>
                     </div>
-                    <div className="flex items-center gap-2">
-                        <button
-                            onClick={() => openEditor('add')}
-                            className="p-2 bg-blue-600 hover:bg-blue-700 text-white rounded-full shadow-md transition-all active:scale-95"
-                            aria-label="Add new place"
-                        >
-                            <Plus size={20} />
-                        </button>
-                        {/* Mobile Toggle Button */}
-                        <button
-                            onClick={toggleSidebar}
-                            className="md:hidden p-2 bg-gray-100 hover:bg-gray-200 text-gray-600 rounded-full transition-colors"
-                        >
-                            {isSidebarOpen ? <ChevronRight className="rotate-90" size={20} /> : null}
-                        </button>
-                    </div>
+                    {/* Mobile Toggle Button */}
+                    <button
+                        onClick={toggleSidebar}
+                        className="md:hidden p-2 bg-gray-100 hover:bg-gray-200 text-gray-600 rounded-full transition-colors"
+                    >
+                        {isSidebarOpen ? <ChevronRight className="rotate-90" size={20} /> : null}
+                    </button>
+                </div>
+
+                {/* Title */}
+                <div className="px-4 pt-4 pb-2">
+                    <h2 className="text-xl font-bold text-gray-800">儲存地點</h2>
+                    <p className="text-sm text-gray-500">{places.length} places</p>
                 </div>
 
                 {/* List */}
@@ -197,24 +205,6 @@ export const Sidebar = () => {
                     ))}
                 </div>
 
-                {/* Footer: User Profile & Logout */}
-                <div className="p-4 border-t border-gray-100 bg-gray-50/50">
-                    <div className="flex items-center gap-3">
-                        <div className="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center text-blue-600 font-bold">
-                            {currentUser?.email?.[0].toUpperCase() || 'U'}
-                        </div>
-                        <div className="flex-1 min-w-0">
-                            <p className="text-sm font-semibold text-gray-900 truncate">{currentUser?.email}</p>
-                            <button
-                                onClick={() => logout()}
-                                className="text-xs text-gray-500 hover:text-red-600 flex items-center gap-1 transition-colors"
-                            >
-                                <LogOut size={12} />
-                                Sign out
-                            </button>
-                        </div>
-                    </div>
-                </div>
             </div>
 
             {/* Desktop Collapse Button - Positioned at the right edge of the left sidebar */}
