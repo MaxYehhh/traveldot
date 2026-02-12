@@ -15,8 +15,7 @@ export const Sidebar = () => {
         deletePlace,
         isSidebarOpen,
         toggleSidebar,
-        setMapCenter,
-        openEditor
+        setMapCenter
     } = useMapStore()
 
     const { currentUser, logout } = useAuthStore()

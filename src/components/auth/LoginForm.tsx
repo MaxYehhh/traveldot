@@ -39,25 +39,28 @@ export function LoginForm({ onToggleMode }: LoginFormProps) {
 
     if (showForgot) {
         return (
-            <div className="w-full max-w-md p-8 space-y-6 bg-white rounded-lg shadow-md animate-in fade-in slide-in-from-bottom-4">
-                <h2 className="text-2xl font-bold text-center text-gray-900">重設密碼</h2>
-                <p className="text-sm text-gray-500 text-center">輸入您的 Email，我們將寄送重設連結給您。</p>
+            <div
+                className="w-full max-w-sm p-8 rounded-2xl space-y-6 animate-in fade-in slide-in-from-bottom-4"
+                style={{ background: 'rgba(255,255,255,0.12)', backdropFilter: 'blur(24px)', border: '1px solid rgba(255,255,255,0.2)' }}
+            >
+                <h2 className="text-2xl font-bold text-center text-white">重設密碼</h2>
+                <p className="text-sm text-white/60 text-center">輸入您的 Email，我們將寄送重設連結給您。</p>
 
                 {error && (
-                    <div className="p-3 text-sm text-red-500 bg-red-50 rounded-md">
+                    <div className="p-3 text-sm text-red-200 bg-red-500/20 rounded-xl">
                         {error}
                     </div>
                 )}
 
                 <form onSubmit={handleForgotPassword} className="space-y-4">
                     <div>
-                        <label className="block text-sm font-medium text-gray-700">Email</label>
+                        <label className="block text-sm font-medium text-white/80">Email</label>
                         <input
                             type="email"
                             required
                             value={forgotEmail}
                             onChange={(e) => setForgotEmail(e.target.value)}
-                            className="w-full px-3 py-2 mt-1 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                            className="w-full px-4 py-3 mt-1 bg-white rounded-xl border-0 text-gray-900 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-400 text-sm"
                             placeholder="your@email.com"
                         />
                     </div>
@@ -65,62 +68,66 @@ export function LoginForm({ onToggleMode }: LoginFormProps) {
                         <button
                             type="button"
                             onClick={() => { setShowForgot(false); clearError(); }}
-                            className="w-full py-2 px-4 border border-gray-300 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-50"
+                            className="w-full py-3 rounded-xl text-sm font-semibold text-white/80 hover:text-white transition-colors"
+                            style={{ background: 'rgba(255,255,255,0.15)', border: '1px solid rgba(255,255,255,0.2)' }}
                         >
                             取消
                         </button>
                         <button
                             type="submit"
                             disabled={loading}
-                            className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50"
+                            className="w-full flex justify-center py-3 bg-blue-500 hover:bg-blue-600 text-white font-semibold text-sm uppercase tracking-wider rounded-xl transition-colors disabled:opacity-50"
                         >
                             {loading ? <Loader2 className="w-5 h-5 animate-spin" /> : '發送重設連結'}
                         </button>
                     </div>
                 </form>
             </div>
-        )
+        );
     }
 
     return (
-        <div className="w-full max-w-md p-8 space-y-6 bg-white rounded-lg shadow-md">
-            <h2 className="text-2xl font-bold text-center text-gray-900">登入 TravelDot</h2>
+        <div
+            className="w-full max-w-sm p-8 rounded-2xl space-y-6"
+            style={{ background: 'rgba(255,255,255,0.12)', backdropFilter: 'blur(24px)', border: '1px solid rgba(255,255,255,0.2)' }}
+        >
+            <h2 className="md:hidden text-2xl font-bold text-white text-center mb-2">登入 TravelDot</h2>
 
             {error && (
-                <div className="p-3 text-sm text-red-500 bg-red-50 rounded-md">
+                <div className="p-3 text-sm text-red-200 bg-red-500/20 rounded-xl">
                     {error}
                 </div>
             )}
 
             <form onSubmit={handleSubmit} className="space-y-4">
                 <div>
-                    <label className="block text-sm font-medium text-gray-700">Email</label>
+                    <label className="block text-sm font-medium text-white/80">Email</label>
                     <input
                         type="email"
                         required
                         value={email}
                         onChange={(e) => setEmail(e.target.value)}
-                        className="w-full px-3 py-2 mt-1 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        className="w-full px-4 py-3 mt-1 bg-white rounded-xl border-0 text-gray-900 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-400 text-sm"
                         placeholder="your@email.com"
                     />
                 </div>
 
                 <div>
-                    <label className="block text-sm font-medium text-gray-700">密碼</label>
+                    <label className="block text-sm font-medium text-white/80">密碼</label>
                     <input
                         ref={passwordInputRef}
                         type="password"
                         required
                         value={password}
                         onChange={(e) => setPassword(e.target.value)}
-                        className="w-full px-3 py-2 mt-1 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        className="w-full px-4 py-3 mt-1 bg-white rounded-xl border-0 text-gray-900 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-400 text-sm"
                         placeholder="••••••••"
                     />
                     <div className="flex justify-end mt-1">
                         <button
                             type="button"
                             onClick={() => setShowForgot(true)}
-                            className="text-xs text-blue-600 hover:text-blue-500"
+                            className="text-xs text-blue-300 hover:text-blue-200 transition-colors"
                         >
                             忘記密碼？
                         </button>
@@ -130,17 +137,17 @@ export function LoginForm({ onToggleMode }: LoginFormProps) {
                 <button
                     type="submit"
                     disabled={loading}
-                    className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50"
+                    className="w-full flex justify-center py-3 bg-blue-500 hover:bg-blue-600 text-white font-semibold text-sm uppercase tracking-wider rounded-xl transition-colors disabled:opacity-50"
                 >
                     {loading ? <Loader2 className="w-5 h-5 animate-spin" /> : '登入'}
                 </button>
             </form>
 
             <div className="text-sm text-center">
-                <span className="text-gray-600">還沒有帳號？</span>{' '}
+                <span className="text-white/60">還沒有帳號？</span>{' '}
                 <button
                     onClick={onToggleMode}
-                    className="font-medium text-blue-600 hover:text-blue-500"
+                    className="font-medium text-blue-300 hover:text-blue-200 underline transition-colors"
                 >
                     註冊新帳號
                 </button>
