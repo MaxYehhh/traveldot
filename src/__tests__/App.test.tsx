@@ -2,7 +2,7 @@ import { render, screen } from '@testing-library/react'
 import { describe, it, expect, vi } from 'vitest'
 import App from '../App'
 
-vi.mock('@/components/features/map/MapContainer', () => ({
+vi.mock('@/components/map/MapContainer', () => ({
     MapContainer: () => <div data-testid="map-container">MapContainer</div>
 }))
 

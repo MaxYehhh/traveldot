@@ -1,0 +1,63 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    
+    // Helper Functions
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+    
+    function isOwner(userId) {
+      return isAuthenticated() && request.auth.uid == userId;
+    }
+    
+    function isValidEmail(email) {
+      return email.matches('^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$');
+    }
+    
+    function isValidTrip(trip) {
+      return trip.title is string
+        && trip.title.size() >= 1
+        && trip.title.size() <= 200
+        && trip.startDate is timestamp
+        && trip.endDate is timestamp
+        && trip.endDate >= trip.startDate;
+    }
+    
+    function isValidPlace(place) {
+      return place.name is string
+        && place.name.size() >= 1
+        && place.name.size() <= 200
+        && place.coordinates.lat is number
+        && place.coordinates.lng is number
+        && place.coordinates.lat >= -90
+        && place.coordinates.lat <= 90
+        && place.coordinates.lng >= -180
+        && place.coordinates.lng <= 180;
+    }
+    
+    // Users Collection
+    match /users/{userId} {
+      allow read: if isOwner(userId);
+      allow create: if isOwner(userId); // Removed email check for simplicity in rule, but can be added back if needed
+      allow update: if isOwner(userId);
+      allow delete: if isOwner(userId);
+      
+      // Trips Subcollection
+      match /trips/{tripId} {
+        allow read: if isOwner(userId);
+        allow create: if isOwner(userId); // && isValidTrip(request.resource.data);
+        allow update: if isOwner(userId); // && isValidTrip(request.resource.data);
+        allow delete: if isOwner(userId);
+        
+        // Places Subcollection
+        match /places/{placeId} {
+          allow read: if isOwner(userId);
+          allow create: if isOwner(userId); // && isValidPlace(request.resource.data);
+          allow update: if isOwner(userId); // && isValidPlace(request.resource.data);
+          allow delete: if isOwner(userId);
+        }
+      }
+    }
+  }
+}

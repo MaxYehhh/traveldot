@@ -1,778 +1,1222 @@
-# TravelDot - UI/UX 設計規格
+# TravelDot - 設計規格文件 (Design Spec)
 
-## 1. 設計原則
+## 目的
 
-### 核心原則
-- **地圖優先**: 地圖始終占據主要視覺空間 (至少 60% 螢幕)
-- **最小化點擊**: 核心操作不超過 3 步
-- **即時回饋**: 所有操作 200ms 內要有視覺回饋
-- **容錯設計**: 重要操作要有確認,可逆操作要有 Undo
-
-### 視覺風格
-- **配色**: 
-  - Primary: 藍色系 (#3B82F6)
-  - Secondary: 綠色系 (#10B981)
-  - Accent: 橘色 (#F59E0B)
-  - Background: 白色/淺灰
-- **圓角**: 統一使用 8px border-radius
-- **陰影**: 使用 Tailwind 的 shadow-md / shadow-lg
-- **字體**: 
-  - 中文: Noto Sans TC
-  - 英文: Inter
+本文件提供精確的視覺標註，包含間距 (Padding)、字體大小、色號、動態效果等，確保設計與開發團隊能精確執行。
 
 ---
 
-## 2. 頁面結構與佈局
+## 1. Design System 設計系統基礎
 
-### 2.1 登入頁 (LoginPage)
+### 1.1 Color Palette 色彩系統
 
-#### 桌面版佈局
-```
-┌─────────────────────────────────────────────────┐
-│                                                 │
-│              [TravelDot Logo]                   │
-│           Every Dot Tells a Story               │
-│                                                 │
-│   ┌─────────────────────────────────┐          │
-│   │  Email                          │          │
-│   │  [________________]             │          │
-│   │                                 │          │
-│   │  Password                       │          │
-│   │  [________________]             │          │
-│   │                                 │          │
-│   │  [    Login Button    ]         │          │
-│   │                                 │          │
-│   │  ──────── or ────────           │          │
-│   │                                 │          │
-│   │  [ Sign in with Google ]        │          │
-│   │                                 │          │
-│   │  Don't have account? Sign up    │          │
-│   └─────────────────────────────────┘          │
-│                                                 │
-│        [Background: Travel Image]               │
-└─────────────────────────────────────────────────┘
+#### Primary Colors 主色
+```css
+--primary-50:  #EFF6FF;   /* 最淺藍 - 背景 */
+--primary-100: #DBEAFE;   /* 淺藍 - Hover 背景 */
+--primary-200: #BFDBFE;   /* 淺藍 - Border */
+--primary-300: #93C5FD;   /* 中藍 - Disabled */
+--primary-400: #60A5FA;   /* 中藍 - Hover */
+--primary-500: #3B82F6;   /* 主藍 - Primary Button, Pin */
+--primary-600: #2563EB;   /* 深藍 - Active */
+--primary-700: #1D4ED8;   /* 深藍 - Pressed */
+--primary-800: #1E40AF;   /* 更深藍 */
+--primary-900: #1E3A8A;   /* 最深藍 */
 ```
 
-#### 手機版佈局
-```
-┌─────────────────┐
-│  [Logo]         │
-│  TravelDot      │
-│                 │
-│  Email          │
-│  [__________]   │
-│                 │
-│  Password       │
-│  [__________]   │
-│                 │
-│  [ Login ]      │
-│                 │
-│  [ Google ]     │
-│                 │
-│  Sign up        │
-└─────────────────┘
+#### Secondary Colors 次要色
+```css
+--secondary-50:  #FFF7ED;   /* 最淺橘 */
+--secondary-100: #FFEDD5;   /* 淺橘 */
+--secondary-200: #FED7AA;   /* 淺橘 */
+--secondary-300: #FDBA74;   /* 中橘 */
+--secondary-400: #FB923C;   /* 中橘 */
+--secondary-500: #F59E0B;   /* 主橘 - Selected Pin, Accent */
+--secondary-600: #EA580C;   /* 深橘 */
+--secondary-700: #C2410C;   /* 深橘 */
+--secondary-800: #9A3412;   /* 更深橘 */
+--secondary-900: #7C2D12;   /* 最深橘 */
 ```
 
-#### 組件規格
-- **Logo**: 
-  - 尺寸: 120x120px
-  - 格式: SVG
-  - 位置: 置中
-  
-- **輸入框**:
-  - 高度: 48px
-  - 寬度: 100% (max 400px)
-  - Border: 1px solid #E5E7EB
-  - Focus: border 變 #3B82F6
-  - Padding: 12px 16px
-  
-- **登入按鈕**:
-  - 高度: 48px
-  - 寬度: 100%
-  - 背景: #3B82F6
-  - Hover: #2563EB
-  - 文字: 白色, 16px, font-semibold
-  - 圓角: 8px
+#### Neutral Colors 中性色
+```css
+--gray-50:  #F9FAFB;   /* 最淺灰 - 背景 */
+--gray-100: #F3F4F6;   /* 淺灰 - Card 背景 */
+--gray-200: #E5E7EB;   /* 淺灰 - Border */
+--gray-300: #D1D5DB;   /* 中灰 - Disabled Text */
+--gray-400: #9CA3AF;   /* 中灰 - Placeholder */
+--gray-500: #6B7280;   /* 中灰 - Secondary Text */
+--gray-600: #4B5563;   /* 深灰 - Body Text */
+--gray-700: #374151;   /* 深灰 - Heading */
+--gray-800: #1F2937;   /* 更深灰 */
+--gray-900: #111827;   /* 最深灰 - Primary Text */
+```
 
-- **Google 登入按鈕**:
-  - 高度: 48px
-  - 寬度: 100%
-  - 背景: 白色
-  - Border: 1px solid #E5E7EB
-  - Icon: Google logo (24px)
-  - 文字: #374151
+#### Semantic Colors 語意色
+```css
+/* Success */
+--success-50:  #F0FDF4;
+--success-500: #10B981;   /* 成功訊息 */
+--success-700: #047857;   /* 成功按鈕 Pressed */
 
-#### 互動細節
-1. **Email 驗證**:
-   - 即時驗證格式 (失焦時)
-   - 錯誤訊息顯示在輸入框下方
-   - 錯誤時輸入框 border 變紅色
-   
-2. **密碼輸入**:
-   - 預設隱藏
-   - 右側有「眼睛」icon 可切換顯示/隱藏
-   
-3. **登入按鈕**:
-   - 點擊後顯示 loading spinner
-   - 按鈕文字變成「登入中...」
-   - 按鈕變 disabled 狀態
+/* Error */
+--error-50:  #FEF2F2;
+--error-500: #EF4444;     /* 錯誤訊息, 刪除按鈕 */
+--error-700: #B91C1C;     /* 錯誤按鈕 Pressed */
 
-4. **錯誤處理**:
-   - 登入失敗: 在表單上方顯示紅色 Alert
-   - 錯誤訊息: 「帳號或密碼錯誤,請重試」
-   - Alert 可以點 X 關閉
+/* Warning */
+--warning-50:  #FFFBEB;
+--warning-500: #F59E0B;   /* 警告訊息 */
+--warning-700: #B45309;   /* 警告按鈕 Pressed */
+
+/* Info */
+--info-50:  #EFF6FF;
+--info-500: #3B82F6;      /* 資訊訊息 */
+--info-700: #1D4ED8;      /* 資訊按鈕 Pressed */
+```
+
+#### Background & Surface 背景與表面
+```css
+--bg-primary:   #FFFFFF;   /* 主背景 */
+--bg-secondary: #F9FAFB;   /* 次要背景 */
+--bg-tertiary:  #F3F4F6;   /* 第三層背景 */
+
+--surface-primary:   #FFFFFF;   /* Card, Modal 背景 */
+--surface-secondary: #F9FAFB;   /* Sidebar 背景 */
+--surface-overlay:   rgba(0, 0, 0, 0.5);   /* Modal 遮罩 */
+```
 
 ---
 
-### 2.2 Landing Page (旅程列表)
+### 1.2 Typography 字體系統
 
-#### 桌面版佈局
-```
-┌─────────────────────────────────────────────────────────┐
-│  [TravelDot]              [Search]        [Profile ▼]   │
-├─────────────────────────────────────────────────────────┤
-│                                                         │
-│  My Trips                              [+ New Trip]     │
-│                                                         │
-│  ┌──────────────┐  ┌──────────────┐  ┌──────────────┐ │
-│  │ [Cover img]  │  │ [Cover img]  │  │ [Cover img]  │ │
-│  │              │  │              │  │              │ │
-│  │ 泰國之旅     │  │ 日本賞櫻     │  │ 台灣環島     │ │
-│  │ Mar 1-15     │  │ Apr 1-10     │  │ May 1-7      │ │
-│  │ 12 places    │  │ 8 places     │  │ 15 places    │ │
-│  └──────────────┘  └──────────────┘  └──────────────┘ │
-│                                                         │
-│  ┌──────────────┐  ┌──────────────┐                   │
-│  │ [Cover img]  │  │ [Add New]    │                   │
-│  │              │  │              │                   │
-│  │ 韓國首爾     │  │   +          │                   │
-│  │ Jun 1-5      │  │              │                   │
-│  │ 6 places     │  │              │                   │
-│  └──────────────┘  └──────────────┘                   │
-│                                                         │
-└─────────────────────────────────────────────────────────┘
+#### Font Family 字體家族
+```css
+--font-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+--font-mono: 'JetBrains Mono', 'Fira Code', 'Courier New', monospace;
 ```
 
-#### 手機版佈局
-```
-┌─────────────────┐
-│ TravelDot    ≡  │
-├─────────────────┤
-│ My Trips        │
-│ [+ New Trip]    │
-│                 │
-│ ┌─────────────┐ │
-│ │[Cover img]  │ │
-│ │泰國之旅     │ │
-│ │Mar 1-15     │ │
-│ │12 places    │ │
-│ └─────────────┘ │
-│                 │
-│ ┌─────────────┐ │
-│ │[Cover img]  │ │
-│ │日本賞櫻     │ │
-│ │Apr 1-10     │ │
-│ │8 places     │ │
-│ └─────────────┘ │
-│                 │
-│ ┌─────────────┐ │
-│ │  Add New    │ │
-│ │     +       │ │
-│ └─────────────┘ │
-└─────────────────┘
+#### Font Size 字體大小
+```css
+--text-xs:   0.75rem;   /* 12px - Caption, Helper Text */
+--text-sm:   0.875rem;  /* 14px - Body Small, Secondary Text */
+--text-base: 1rem;      /* 16px - Body, Primary Text */
+--text-lg:   1.125rem;  /* 18px - Subtitle */
+--text-xl:   1.25rem;   /* 20px - Heading 3 */
+--text-2xl:  1.5rem;    /* 24px - Heading 2 */
+--text-3xl:  1.875rem;  /* 30px - Heading 1 */
+--text-4xl:  2.25rem;   /* 36px - Display */
 ```
 
-#### 組件規格
+#### Font Weight 字重
+```css
+--font-normal:    400;   /* Body Text */
+--font-medium:    500;   /* Emphasis, Button */
+--font-semibold:  600;   /* Heading, Strong */
+--font-bold:      700;   /* Display, Hero */
+```
 
-**Header**:
-- 高度: 64px
-- 背景: 白色
-- Border-bottom: 1px solid #E5E7EB
-- Padding: 0 24px
+#### Line Height 行高
+```css
+--leading-tight:  1.25;   /* Heading */
+--leading-normal: 1.5;    /* Body Text */
+--leading-relaxed: 1.75;  /* Long Form Content */
+```
 
-**Trip Card**:
-- 尺寸: 
-  - 桌面: 300x240px
-  - 手機: 100% x 180px
-- 封面圖:
-  - 高度: 160px
-  - Object-fit: cover
-- 內容區:
-  - Padding: 16px
-  - 標題: 18px, font-semibold
-  - 日期: 14px, text-gray-600
-  - 地點數: 14px, text-gray-500
-- Hover:
-  - Shadow: shadow-md → shadow-lg
-  - Transform: translateY(-4px)
-  - Transition: 200ms
-
-**New Trip Button**:
-- 高度: 48px
-- 背景: #3B82F6
-- 文字: 白色, 16px
-- Icon: Plus (+)
-- 圓角: 8px
-- Hover: 背景變 #2563EB
-
-#### 互動細節
-
-1. **點擊 Trip Card**:
-   - 跳轉到該旅程的地圖頁面
-   - 使用 fade-in 轉場動畫
-
-2. **New Trip 流程**:
-   - 點擊 [+ New Trip] 按鈕
-   - 彈出 Modal (見下方 Modal 規格)
-   - 填寫旅程名稱、日期
-   - 點擊 Create → 關閉 Modal → 新卡片出現在列表最前方
-
-3. **Card 長按/右鍵**:
-   - 顯示選單: Edit / Delete / Share
-   - Delete 要跳確認對話框
+#### Letter Spacing 字距
+```css
+--tracking-tight:  -0.025em;   /* Heading */
+--tracking-normal:  0em;       /* Body */
+--tracking-wide:    0.025em;   /* Button, Label */
+```
 
 ---
 
-### 2.3 地圖主頁面 (MapPage)
+### 1.3 Spacing Scale 間距系統
 
-#### 桌面版佈局 (最重要!)
-```
-┌─────────────────────────────────────────────────────────────┐
-│ [TravelDot]  [泰國之旅 ▼]  [Map/List]  [Filter]  [Profile] │
-├─────────────────────────────────────────────────────────────┤
-│                                    │                        │
-│                                    │  ┌──────────────────┐  │
-│                                    │  │ 清邁             │  │
-│       [Google Maps]                │  │ 12 places        │  │
-│                                    │  ├──────────────────┤  │
-│       • • •  (pins)                │  │ □ Cafe Amazon   │  │
-│                                    │  │   Mar 5, 14:30  │  │
-│                                    │  │   ⭐⭐⭐⭐⭐    │  │
-│                                    │  │                 │  │
-│                                    │  │ □ Night Market  │  │
-│                                    │  │   Mar 6, 19:00  │  │
-│         [+ 按鈕]                   │  │   ⭐⭐⭐⭐      │  │
-│                                    │  │                 │  │
-│                                    │  │ □ Doi Suthep   │  │
-│                                    │  │   Mar 7, 09:00  │  │
-│                                    │  │   ⭐⭐⭐⭐⭐    │  │
-│                                    │  └──────────────────┘  │
-│                                    │                        │
-└─────────────────────────────────────────────────────────────┘
-     70%                                    30%
+```css
+--space-0:   0px;      /* 0 */
+--space-1:   0.25rem;  /* 4px */
+--space-2:   0.5rem;   /* 8px */
+--space-3:   0.75rem;  /* 12px */
+--space-4:   1rem;     /* 16px */
+--space-5:   1.25rem;  /* 20px */
+--space-6:   1.5rem;   /* 24px */
+--space-8:   2rem;     /* 32px */
+--space-10:  2.5rem;   /* 40px */
+--space-12:  3rem;     /* 48px */
+--space-16:  4rem;     /* 64px */
+--space-20:  5rem;     /* 80px */
+--space-24:  6rem;     /* 96px */
 ```
 
-#### 手機版佈局
-```
-┌─────────────────┐
-│ ≡  泰國之旅  ⋮  │
-├─────────────────┤
-│                 │
-│  [Google Map]   │
-│                 │
-│    • • •        │
-│                 │
-│                 │
-│                 │
-│      [+]        │ ← Floating Action Button
-│                 │
-├─────────────────┤ ← 可向上拉的 Sheet
-│ ═══ 12 places   │
-│                 │
-│ □ Cafe Amazon   │
-│   Mar 5         │
-└─────────────────┘
-```
-
-#### 關鍵組件規格
-
-**1. Floating Action Button (FAB)**
-- 位置: 右下角,距離邊緣 24px
-- 尺寸: 56x56px (圓形)
-- 背景: #3B82F6
-- Icon: Plus (+), 24px, 白色
-- Shadow: shadow-lg
-- Hover: 
-  - 背景變 #2563EB
-  - Scale 1.1
-  - Shadow 變深
-- 點擊:
-  - 彈出選單 (向上展開)
-  - 選項: 
-    - 📍 搜尋地點
-    - 📌 使用當前位置
-    - 🗺️ 在地圖上選點
-
-**2. Map Pin (標記點)**
-- **預設狀態**:
-  - Icon: 標準 Google Maps pin
-  - 顏色: #3B82F6
-  - 尺寸: 32x40px
-  
-- **Hover 狀態**:
-  - Scale: 1.2
-  - Cursor: pointer
-  
-- **已選中狀態**:
-  - 顏色: #F59E0B (橘色)
-  - 上下跳動動畫
-
-- **Clustering (聚合)**:
-  - 圓形背景: #3B82F6
-  - 白色文字顯示數量
-  - 尺寸隨數量增加: 40px, 50px, 60px
-
-**3. 側邊欄 (Sidebar - 桌面版)**
-- 寬度: 360px
-- 背景: 白色
-- Border-left: 1px solid #E5E7EB
-- 可收合 (點擊箭頭圖示)
-
-**4. Bottom Sheet (手機版)**
-- 預設高度: 160px (顯示標題 + 前 2 個地點)
-- 完全展開: 80vh
-- 背景: 白色
-- 圓角: 上方 16px
-- 拖曳手柄: 中央有灰色橫條 (36x4px)
-
-**5. Place Preview Card (點擊 Pin 時顯示)**
-```
-┌─────────────────────────────┐
-│ [關閉 X]                    │
-│                             │
-│ [照片輪播]                  │
-│                             │
-│ Cafe Amazon                 │
-│ 📍 Nimmana Haeminda Rd      │
-│ 📅 Mar 5, 2024 14:30        │
-│ ⭐⭐⭐⭐⭐                 │
-│                             │
-│ 很棒的工作空間...          │
-│                             │
-│ #咖啡 #工作空間 #推薦      │
-│                             │
-│ [   Edit   ] [ Delete ]     │
-└─────────────────────────────┘
-```
-
-- 位置: 地圖中央
-- 尺寸: 
-  - 桌面: 400x auto (max-height: 600px)
-  - 手機: 90% width x auto
-- 背景: 白色
-- Shadow: shadow-xl
-- 圓角: 12px
-- 照片輪播:
-  - 高度: 240px
-  - 左右箭頭導航
-  - 底部 dots 指示器
-
-#### 互動流程
-
-**新增地點完整流程:**
-
-1. **點擊 FAB (+)**
-   ```
-   展開選單:
-   ┌─────────────────┐
-   │ 📍 搜尋地點     │
-   │ 📌 當前位置     │
-   │ 🗺️ 地圖選點   │
-   └─────────────────┘
-   ```
-
-2. **選擇「搜尋地點」**
-   - 彈出全螢幕搜尋介面
-   - 頂部: 搜尋框 + 取消按鈕
-   - 下方: 搜尋建議列表 (Google Places)
-   - 點擊建議 → 跳到步驟 4
-
-3. **選擇「當前位置」**
-   - 自動抓取 GPS 座標
-   - 地圖中心移到當前位置
-   - 顯示 Pin
-   - 跳到步驟 4
-
-4. **選擇「地圖選點」**
-   - 地圖進入「選點模式」
-   - 十字準星出現在地圖中央
-   - 拖動地圖 = 移動準星
-   - 底部顯示「確認位置」按鈕
-   - 點擊 → 跳到步驟 4
-
-5. **打開編輯器 Modal**
-   - 全螢幕 Modal (手機)
-   - 置中 Modal (桌面,寬度 600px)
-   - 預填地點名稱和座標
-   - 可編輯所有欄位
-
-6. **儲存**
-   - 點擊「儲存」按鈕
-   - 顯示 loading
-   - 儲存成功:
-     - Toast 通知:「地點已新增」
-     - 關閉 Modal
-     - 地圖上出現新 Pin
-     - 側邊欄列表更新
+**使用原則**：
+- **4px 基準**：所有間距都是 4px 的倍數
+- **元件內部**：使用 4px, 8px, 12px, 16px
+- **元件之間**：使用 16px, 24px, 32px
+- **區塊之間**：使用 48px, 64px, 96px
 
 ---
 
-### 2.4 編輯器 Modal (PlaceEditor)
+### 1.4 Shadows & Effects 陰影與效果
 
-#### 桌面版佈局
-```
-┌────────────────────────────────────────────────┐
-│ 新增地點                              [關閉 X] │
-├────────────────────────────────────────────────┤
-│                                                │
-│ 地點名稱 *                                     │
-│ [Cafe Amazon_________________________]         │
-│                                                │
-│ 地址 (自動填入)                                │
-│ [239 Nimmana Haeminda Rd Ln 1________]         │
-│                                                │
-│ 日期與時間 *                                   │
-│ [2024/03/05] [14:30]                           │
-│                                                │
-│ 評分                                           │
-│ ⭐⭐⭐⭐⭐ (可點擊)                          │
-│                                                │
-│ 照片                                           │
-│ ┌────┐ ┌────┐ ┌────┐ [+ 新增]              │
-│ │img1│ │img2│ │img3│                         │
-│ └────┘ └────┘ └────┘                         │
-│                                                │
-│ 內容                                           │
-│ ┌──────────────────────────────────────┐      │
-│ │ [B] [I] [Link] [List]                │      │
-│ ├──────────────────────────────────────┤      │
-│ │                                      │      │
-│ │ 很棒的工作空間,咖啡也不錯...       │      │
-│ │                                      │      │
-│ └──────────────────────────────────────┘      │
-│                                                │
-│ 標籤                                           │
-│ [#咖啡] [#工作空間] [+ 新增標籤]              │
-│                                                │
-│ 公開設定                                       │
-│ [✓] 讓其他人可以搜尋到這個地點                 │
-│                                                │
-│           [取消]        [儲存]                 │
-└────────────────────────────────────────────────┘
+#### Box Shadow 陰影
+```css
+--shadow-xs:  0 1px 2px 0 rgba(0, 0, 0, 0.05);
+--shadow-sm:  0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px -1px rgba(0, 0, 0, 0.1);
+--shadow-md:  0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1);
+--shadow-lg:  0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -4px rgba(0, 0, 0, 0.1);
+--shadow-xl:  0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
+--shadow-2xl: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
 ```
 
-#### 手機版佈局
+**使用場景**：
+- `shadow-xs`: Input Focus
+- `shadow-sm`: Card, Button
+- `shadow-md`: Dropdown, Tooltip
+- `shadow-lg`: Modal, Sidebar
+- `shadow-xl`: FAB, Floating Element
+- `shadow-2xl`: Hero Image, Feature Card
+
+#### Border Radius 圓角
+```css
+--radius-none: 0px;
+--radius-sm:   0.25rem;  /* 4px - Input, Tag */
+--radius-md:   0.5rem;   /* 8px - Button, Card */
+--radius-lg:   0.75rem;  /* 12px - Modal, Image */
+--radius-xl:   1rem;     /* 16px - Hero Card */
+--radius-full: 9999px;   /* Circle - Avatar, Badge */
 ```
-┌─────────────────┐
-│ ← 新增地點      │
-├─────────────────┤
-│                 │
-│ 地點名稱 *      │
-│ [__________]    │
-│                 │
-│ 日期 *          │
-│ [2024/03/05]    │
-│                 │
-│ 評分            │
-│ ⭐⭐⭐⭐⭐    │
-│                 │
-│ 照片            │
-│ [img][img][+]   │
-│                 │
-│ 內容            │
-│ [編輯器]        │
-│                 │
-│ 標籤            │
-│ [#咖啡][+]      │
-│                 │
-│ 公開 [✓]        │
-│                 │
-│    [儲存]       │
-└─────────────────┘
-```
-
-#### 詳細組件規格
-
-**1. 照片上傳區**
-- **上傳按鈕**:
-  - 尺寸: 80x80px
-  - 背景: #F3F4F6
-  - Border: 2px dashed #D1D5DB
-  - Icon: Plus (+)
-  - Hover: 背景變 #E5E7EB
-
-- **照片縮圖**:
-  - 尺寸: 80x80px
-  - 圓角: 8px
-  - Object-fit: cover
-  - 右上角有 X 刪除按鈕 (hover 時顯示)
-  
-- **拖曳排序**:
-  - 可拖動縮圖調整順序
-  - 拖動時縮圖變半透明
-  - 有虛線方框顯示放置位置
-
-- **照片放大檢視**:
-  - 點擊縮圖 → 全螢幕顯示
-  - 左右箭頭切換
-  - ESC 或點擊背景關閉
-
-**2. Rich Text 編輯器**
-- **工具列**:
-  - 高度: 40px
-  - 背景: #F9FAFB
-  - Border-bottom: 1px solid #E5E7EB
-  - 按鈕: 32x32px, hover 時背景變灰
-  
-- **編輯區**:
-  - 最小高度: 200px
-  - Padding: 16px
-  - 字體: 16px
-  - 行高: 1.6
-
-- **支援格式**:
-  - 粗體 (Ctrl+B)
-  - 斜體 (Ctrl+I)
-  - 連結 (Ctrl+K)
-  - 無序列表
-  - 換行
-
-**3. 標籤輸入**
-- **已選標籤**:
-  - 背景: #DBEAFE
-  - 文字: #1E40AF
-  - 圓角: 16px
-  - Padding: 4px 12px
-  - 右側有 X 可刪除
-
-- **新增標籤**:
-  - 點擊 [+ 新增標籤]
-  - 彈出輸入框
-  - 自動建議已使用過的標籤
-  - Enter 確認
-
-**4. 公開設定**
-- Checkbox + Label
-- 預設: 不勾選 (私密)
-- 說明文字: 「公開後,其他人可以搜尋到這個地點」(灰色,小字)
-
-**5. 底部按鈕**
-- **取消**:
-  - 背景: 白色
-  - Border: 1px solid #D1D5DB
-  - 文字: #374151
-  - Hover: 背景 #F9FAFB
-
-- **儲存**:
-  - 背景: #3B82F6
-  - 文字: 白色
-  - Hover: #2563EB
-  - Disabled (表單未填完):
-    - 背景: #93C5FD
-    - Cursor: not-allowed
-
-#### 驗證規則
-- **必填欄位**: 地點名稱、日期
-- **地點名稱**: 1-200 字元
-- **日期**: 不能晚於今天
-- **照片**: 單張最大 10MB,總共最多 20 張
-- **評分**: 0-5 星 (可不評分)
-
-#### 互動細節
-
-**上傳照片流程:**
-1. 點擊 [+ 新增] 或拖曳照片到區域
-2. 選擇檔案 (可多選)
-3. 顯示 loading (每張照片一個 progress bar)
-4. 壓縮照片 (保持品質)
-5. 上傳到 Firebase Storage
-6. 顯示縮圖
-7. 可拖曳調整順序
-8. 可點擊縮圖放大檢視
-9. 可點擊 X 刪除
-
-**儲存流程:**
-1. 點擊「儲存」
-2. 驗證所有必填欄位
-3. 如果有錯誤:
-   - 對應欄位顯示紅色錯誤訊息
-   - 捲動到第一個錯誤欄位
-   - 停止儲存
-4. 如果沒錯誤:
-   - 按鈕顯示 loading spinner
-   - 按鈕文字變「儲存中...」
-   - 儲存到 Firestore
-5. 儲存成功:
-   - 關閉 Modal
-   - 顯示 Toast:「地點已儲存」
-   - 更新地圖和列表
-6. 儲存失敗:
-   - 顯示錯誤訊息 Alert
-   - 按鈕恢復正常
-   - 可重試
 
 ---
 
-## 3. 載入狀態與錯誤處理
+### 1.5 Animation & Transition 動畫與轉場
 
-### 3.1 Loading 狀態
-
-**全頁載入** (First Load)
-```
-┌─────────────────┐
-│                 │
-│                 │
-│   [Spinner]     │
-│   載入中...     │
-│                 │
-│                 │
-└─────────────────┘
+#### Duration 持續時間
+```css
+--duration-fast:   150ms;   /* Hover, Focus */
+--duration-normal: 200ms;   /* Button Click, Fade */
+--duration-slow:   300ms;   /* Modal, Slide */
+--duration-slower: 500ms;   /* Page Transition */
 ```
 
-**區域載入** (部分更新)
-- 使用 Skeleton Screen
-- 保持佈局不跳動
-
-**按鈕載入**
-- 按鈕內顯示 spinner
-- 按鈕變 disabled
-- 文字變「處理中...」
-
-### 3.2 錯誤處理
-
-**網路錯誤**
-```
-┌─────────────────────────────┐
-│ ⚠️ 網路連線失敗             │
-│ 請檢查您的網路連線後重試    │
-│         [重試]              │
-└─────────────────────────────┘
+#### Easing 緩動函數
+```css
+--ease-in:      cubic-bezier(0.4, 0, 1, 1);
+--ease-out:     cubic-bezier(0, 0, 0.2, 1);
+--ease-in-out:  cubic-bezier(0.4, 0, 0.2, 1);
+--ease-bounce:  cubic-bezier(0.68, -0.55, 0.265, 1.55);
 ```
 
-**表單驗證錯誤**
-- 欄位下方顯示紅色文字
-- 輸入框 border 變紅色
-- 捲動到第一個錯誤欄位
-
-**Toast 通知** (成功/失敗)
-- 位置: 螢幕頂部中央
-- 顯示 3 秒後自動消失
-- 可點擊 X 提前關閉
-- 成功: 綠色背景
-- 失敗: 紅色背景
+**使用場景**：
+- `ease-in`: 元素消失（Fade Out, Slide Out）
+- `ease-out`: 元素出現（Fade In, Slide In）
+- `ease-in-out`: 元素移動（Slide, Scale）
+- `ease-bounce`: 強調動畫（Button Click, Notification）
 
 ---
 
-## 4. 響應式設計斷點
+## 2. Component Specifications 元件規格
 
+### 2.1 Button 按鈕
+
+#### Primary Button 主要按鈕
+```css
+/* Normal State */
+background: var(--primary-500);
+color: #FFFFFF;
+padding: 12px 24px;
+border-radius: var(--radius-md);
+font-size: var(--text-base);
+font-weight: var(--font-medium);
+box-shadow: var(--shadow-sm);
+transition: all var(--duration-fast) var(--ease-out);
+
+/* Hover State */
+background: var(--primary-600);
+box-shadow: var(--shadow-md);
+transform: translateY(-1px);
+
+/* Active/Pressed State */
+background: var(--primary-700);
+box-shadow: var(--shadow-xs);
+transform: translateY(0);
+
+/* Disabled State */
+background: var(--gray-300);
+color: var(--gray-500);
+cursor: not-allowed;
+box-shadow: none;
+
+/* Loading State */
+background: var(--primary-500);
+opacity: 0.7;
+cursor: wait;
+/* 顯示 spinner icon */
 ```
-Mobile:   < 768px   (手機)
-Tablet:   768-1024px (平板)
-Desktop:  > 1024px   (桌面)
+
+**尺寸變化**：
+```css
+/* Small */
+padding: 8px 16px;
+font-size: var(--text-sm);
+
+/* Medium (Default) */
+padding: 12px 24px;
+font-size: var(--text-base);
+
+/* Large */
+padding: 16px 32px;
+font-size: var(--text-lg);
 ```
 
-### 4.1 主要變化
+#### Secondary Button 次要按鈕
+```css
+/* Normal State */
+background: transparent;
+color: var(--primary-500);
+border: 2px solid var(--primary-500);
+padding: 10px 22px; /* 減 2px 補償 border */
+border-radius: var(--radius-md);
+font-size: var(--text-base);
+font-weight: var(--font-medium);
+transition: all var(--duration-fast) var(--ease-out);
 
-**Mobile:**
-- 單欄佈局
-- 側邊欄改成 Bottom Sheet
-- FAB 放大 (更好點擊)
-- 字體稍微放大
+/* Hover State */
+background: var(--primary-50);
+border-color: var(--primary-600);
+color: var(--primary-600);
 
-**Tablet:**
-- 可選擇顯示側邊欄
-- 地圖 60% + 側邊欄 40%
+/* Active/Pressed State */
+background: var(--primary-100);
+border-color: var(--primary-700);
+color: var(--primary-700);
+```
 
-**Desktop:**
-- 地圖 70% + 側邊欄 30%
-- Hover 效果更明顯
-- 可使用鍵盤快捷鍵
+#### Danger Button 危險按鈕
+```css
+/* Normal State */
+background: var(--error-500);
+color: #FFFFFF;
+/* 其他屬性同 Primary Button */
 
----
+/* Hover State */
+background: var(--error-600);
 
-## 5. 動畫與轉場
-
-### 5.1 頁面轉場
-- 使用 fade-in
-- 時間: 300ms
-- Easing: ease-out
-
-### 5.2 Modal 彈出
-- 從中央 scale-up
-- 背景 fade-in
-- 時間: 200ms
-
-### 5.3 列表項目
-- 新增項目: slide-down
-- 刪除項目: slide-up + fade-out
-- 時間: 200ms
-
-### 5.4 地圖動畫
-- Pin 點擊: bounce
-- Zoom: smooth transition
-- Pan: smooth
+/* Active/Pressed State */
+background: var(--error-700);
+```
 
 ---
 
-## 6. 可訪問性 (A11y)
+### 2.2 Input 輸入框
 
-### 6.1 鍵盤導航
-- 所有互動元素可用 Tab 切換
-- 按 Enter 觸發點擊
-- Modal 打開時 focus 在第一個輸入框
-- ESC 關閉 Modal
+#### Text Input 文字輸入框
+```css
+/* Normal State */
+width: 100%;
+padding: 12px 16px;
+border: 2px solid var(--gray-200);
+border-radius: var(--radius-md);
+font-size: var(--text-base);
+color: var(--gray-900);
+background: var(--bg-primary);
+transition: all var(--duration-fast) var(--ease-out);
 
-### 6.2 螢幕閱讀器
-- 所有 Icon 按鈕要有 aria-label
-- 圖片要有 alt text
-- 表單要有 label
+/* Focus State */
+border-color: var(--primary-500);
+box-shadow: 0 0 0 3px var(--primary-50);
+outline: none;
 
-### 6.3 顏色對比
-- 文字與背景對比至少 4.5:1
-- 連結要有底線或明顯顏色差異
+/* Error State */
+border-color: var(--error-500);
+box-shadow: 0 0 0 3px var(--error-50);
+
+/* Disabled State */
+background: var(--gray-100);
+color: var(--gray-500);
+cursor: not-allowed;
+```
+
+**Placeholder 樣式**：
+```css
+::placeholder {
+  color: var(--gray-400);
+  font-style: italic;
+}
+```
+
+**Label 樣式**：
+```css
+font-size: var(--text-sm);
+font-weight: var(--font-medium);
+color: var(--gray-700);
+margin-bottom: var(--space-2);
+display: block;
+```
+
+**Error Message 樣式**：
+```css
+font-size: var(--text-sm);
+color: var(--error-500);
+margin-top: var(--space-2);
+display: flex;
+align-items: center;
+gap: var(--space-1);
+/* Icon: AlertCircle, 16px */
+```
 
 ---
 
-## 7. 設計資源
+### 2.3 Card 卡片
 
-### 7.1 Icon 來源
-- Heroicons (https://heroicons.com)
-- 或 Lucide Icons (https://lucide.dev)
+#### Trip Card 旅程卡片
+```css
+/* Container */
+width: 100%;
+max-width: 360px;
+background: var(--surface-primary);
+border-radius: var(--radius-lg);
+box-shadow: var(--shadow-sm);
+overflow: hidden;
+transition: all var(--duration-normal) var(--ease-out);
+cursor: pointer;
 
-### 7.2 字體
-- Google Fonts: Inter + Noto Sans TC
+/* Hover State */
+box-shadow: var(--shadow-lg);
+transform: translateY(-4px);
 
-### 7.3 配色參考
-參考 Dribbble 搜尋:
-- "travel app minimal"
-- "map interface"
-- "blue color scheme"
+/* Cover Image */
+width: 100%;
+height: 200px;
+object-fit: cover;
+background: var(--gray-200); /* Placeholder */
+
+/* Content */
+padding: var(--space-4);
+
+/* Title */
+font-size: var(--text-xl);
+font-weight: var(--font-semibold);
+color: var(--gray-900);
+margin-bottom: var(--space-2);
+/* 最多顯示 2 行，超過顯示 ... */
+display: -webkit-box;
+-webkit-line-clamp: 2;
+-webkit-box-orient: vertical;
+overflow: hidden;
+
+/* Date */
+font-size: var(--text-sm);
+color: var(--gray-500);
+margin-bottom: var(--space-1);
+display: flex;
+align-items: center;
+gap: var(--space-1);
+/* Icon: Calendar, 16px */
+
+/* Place Count */
+font-size: var(--text-sm);
+color: var(--gray-500);
+display: flex;
+align-items: center;
+gap: var(--space-1);
+/* Icon: MapPin, 16px */
+```
+
+#### Place Preview Card 地點預覽卡片
+```css
+/* Container */
+width: 400px;
+max-width: 90vw;
+background: var(--surface-primary);
+border-radius: var(--radius-lg);
+box-shadow: var(--shadow-xl);
+overflow: hidden;
+position: absolute;
+z-index: 1000;
+/* 出現動畫: scale-up */
+animation: scaleUp var(--duration-normal) var(--ease-out);
+
+@keyframes scaleUp {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+/* Close Button */
+position: absolute;
+top: var(--space-4);
+right: var(--space-4);
+width: 32px;
+height: 32px;
+background: rgba(0, 0, 0, 0.5);
+color: #FFFFFF;
+border-radius: var(--radius-full);
+display: flex;
+align-items: center;
+justify-content: center;
+cursor: pointer;
+transition: background var(--duration-fast) var(--ease-out);
+
+/* Close Button Hover */
+background: rgba(0, 0, 0, 0.7);
+
+/* Photo Carousel */
+width: 100%;
+height: 240px;
+position: relative;
+
+/* Photo */
+width: 100%;
+height: 100%;
+object-fit: cover;
+
+/* Carousel Arrows */
+position: absolute;
+top: 50%;
+transform: translateY(-50%);
+width: 40px;
+height: 40px;
+background: rgba(255, 255, 255, 0.9);
+border-radius: var(--radius-full);
+display: flex;
+align-items: center;
+justify-content: center;
+cursor: pointer;
+box-shadow: var(--shadow-md);
+transition: all var(--duration-fast) var(--ease-out);
+
+/* Left Arrow */
+left: var(--space-4);
+
+/* Right Arrow */
+right: var(--space-4);
+
+/* Arrow Hover */
+background: #FFFFFF;
+box-shadow: var(--shadow-lg);
+
+/* Carousel Dots */
+position: absolute;
+bottom: var(--space-4);
+left: 50%;
+transform: translateX(-50%);
+display: flex;
+gap: var(--space-2);
+
+/* Dot */
+width: 8px;
+height: 8px;
+border-radius: var(--radius-full);
+background: rgba(255, 255, 255, 0.5);
+cursor: pointer;
+transition: all var(--duration-fast) var(--ease-out);
+
+/* Active Dot */
+background: #FFFFFF;
+width: 24px;
+
+/* Content */
+padding: var(--space-6);
+
+/* Place Name */
+font-size: var(--text-2xl);
+font-weight: var(--font-semibold);
+color: var(--gray-900);
+margin-bottom: var(--space-3);
+
+/* Address */
+font-size: var(--text-sm);
+color: var(--gray-500);
+margin-bottom: var(--space-2);
+display: flex;
+align-items: flex-start;
+gap: var(--space-2);
+/* Icon: MapPin, 16px */
+
+/* Date */
+font-size: var(--text-sm);
+color: var(--gray-500);
+margin-bottom: var(--space-4);
+display: flex;
+align-items: center;
+gap: var(--space-2);
+/* Icon: Calendar, 16px */
+
+/* Rating */
+display: flex;
+gap: var(--space-1);
+margin-bottom: var(--space-4);
+/* Icon: Star (filled/outlined), 20px, color: #F59E0B */
+
+/* Content Text */
+font-size: var(--text-base);
+color: var(--gray-700);
+line-height: var(--leading-normal);
+margin-bottom: var(--space-4);
+/* 最多顯示 3 行，超過顯示 ... */
+display: -webkit-box;
+-webkit-line-clamp: 3;
+-webkit-box-orient: vertical;
+overflow: hidden;
+
+/* Tags */
+display: flex;
+flex-wrap: wrap;
+gap: var(--space-2);
+margin-bottom: var(--space-6);
+
+/* Tag Chip */
+padding: var(--space-1) var(--space-3);
+background: var(--primary-50);
+color: var(--primary-700);
+border-radius: var(--radius-sm);
+font-size: var(--text-sm);
+font-weight: var(--font-medium);
+
+/* Action Buttons */
+display: flex;
+gap: var(--space-3);
+justify-content: flex-end;
+```
 
 ---
 
-## 8. 實作檢查清單
+### 2.4 Modal 對話框
 
-每個頁面完成後,檢查:
-- [ ] 符合設計稿 (包含間距、顏色、字體)
-- [ ] 響應式 (手機、平板、桌面都測試過)
-- [ ] 所有互動狀態都有 (hover, active, disabled, loading)
-- [ ] 錯誤處理完整 (網路錯誤、驗證錯誤)
-- [ ] 可訪問性 (鍵盤導航、螢幕閱讀器)
-- [ ] 效能達標 (載入時間、動畫流暢度)
+#### Modal Container 對話框容器
+```css
+/* Overlay */
+position: fixed;
+top: 0;
+left: 0;
+right: 0;
+bottom: 0;
+background: var(--surface-overlay);
+z-index: 9999;
+display: flex;
+align-items: center;
+justify-content: center;
+padding: var(--space-4);
+/* 出現動畫: fade-in */
+animation: fadeIn var(--duration-normal) var(--ease-out);
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+/* Modal */
+width: 100%;
+max-width: 600px;
+max-height: 90vh;
+background: var(--surface-primary);
+border-radius: var(--radius-lg);
+box-shadow: var(--shadow-2xl);
+overflow: hidden;
+/* 出現動畫: slide-up */
+animation: slideUp var(--duration-slow) var(--ease-out);
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Header */
+padding: var(--space-6);
+border-bottom: 1px solid var(--gray-200);
+display: flex;
+align-items: center;
+justify-content: space-between;
+
+/* Title */
+font-size: var(--text-2xl);
+font-weight: var(--font-semibold);
+color: var(--gray-900);
+
+/* Close Button */
+width: 32px;
+height: 32px;
+border-radius: var(--radius-md);
+display: flex;
+align-items: center;
+justify-content: center;
+cursor: pointer;
+transition: background var(--duration-fast) var(--ease-out);
+
+/* Close Button Hover */
+background: var(--gray-100);
+
+/* Body */
+padding: var(--space-6);
+overflow-y: auto;
+max-height: calc(90vh - 160px); /* 減去 header 與 footer */
+
+/* Footer */
+padding: var(--space-6);
+border-top: 1px solid var(--gray-200);
+display: flex;
+gap: var(--space-3);
+justify-content: flex-end;
+```
 
 ---
 
-## 注意事項
+### 2.5 Toast Notification 提示訊息
 
-這份設計規格是「最小可行設計」(MVD),只包含 MVP 必要的畫面和互動。
+#### Toast Container 提示容器
+```css
+/* Container */
+position: fixed;
+bottom: var(--space-6);
+right: var(--space-6);
+z-index: 10000;
+display: flex;
+flex-direction: column;
+gap: var(--space-3);
+max-width: 400px;
 
-**如果實作時遇到設計未定義的細節,請:**
-1. 參考 Material Design 或 Apple HIG 的最佳實踐
-2. 保持與現有設計的一致性
-3. 優先考慮使用者體驗
-4. 記錄下來並更新此文件
+/* Toast */
+padding: var(--space-4) var(--space-5);
+background: var(--gray-900);
+color: #FFFFFF;
+border-radius: var(--radius-md);
+box-shadow: var(--shadow-lg);
+display: flex;
+align-items: center;
+gap: var(--space-3);
+/* 出現動畫: slide-in-right */
+animation: slideInRight var(--duration-normal) var(--ease-out);
 
-**設計原則優先級:**
-1. 功能性 > 美觀性
-2. 簡單 > 複雜
-3. 一致性 > 創新
+@keyframes slideInRight {
+  from {
+    opacity: 0;
+    transform: translateX(100%);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+/* Icon */
+width: 20px;
+height: 20px;
+flex-shrink: 0;
+
+/* Message */
+font-size: var(--text-base);
+flex: 1;
+
+/* Close Button */
+width: 20px;
+height: 20px;
+cursor: pointer;
+opacity: 0.7;
+transition: opacity var(--duration-fast) var(--ease-out);
+
+/* Close Button Hover */
+opacity: 1;
+
+/* Success Toast */
+background: var(--success-500);
+
+/* Error Toast */
+background: var(--error-500);
+
+/* Warning Toast */
+background: var(--warning-500);
+
+/* Info Toast */
+background: var(--info-500);
+```
+
+---
+
+### 2.6 FAB (Floating Action Button) 浮動操作按鈕
+
+```css
+/* Container */
+position: fixed;
+bottom: var(--space-6);
+right: var(--space-6);
+z-index: 1000;
+
+/* FAB Button */
+width: 56px;
+height: 56px;
+background: var(--primary-500);
+color: #FFFFFF;
+border-radius: var(--radius-full);
+box-shadow: var(--shadow-xl);
+display: flex;
+align-items: center;
+justify-content: center;
+cursor: pointer;
+transition: all var(--duration-normal) var(--ease-out);
+
+/* Hover State */
+background: var(--primary-600);
+box-shadow: var(--shadow-2xl);
+transform: scale(1.1);
+
+/* Active State (Menu Open) */
+background: var(--primary-700);
+transform: rotate(45deg);
+
+/* Icon */
+width: 24px;
+height: 24px;
+transition: transform var(--duration-normal) var(--ease-out);
+
+/* Menu */
+position: absolute;
+bottom: 72px; /* FAB height + gap */
+right: 0;
+display: flex;
+flex-direction: column;
+gap: var(--space-3);
+/* 出現動畫: stagger */
+
+/* Menu Item */
+padding: var(--space-3) var(--space-4);
+background: var(--surface-primary);
+border-radius: var(--radius-md);
+box-shadow: var(--shadow-lg);
+display: flex;
+align-items: center;
+gap: var(--space-3);
+cursor: pointer;
+white-space: nowrap;
+transition: all var(--duration-fast) var(--ease-out);
+/* 依序出現，每個延遲 50ms */
+animation: slideInUp var(--duration-normal) var(--ease-out);
+
+@keyframes slideInUp {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Menu Item Hover */
+background: var(--primary-50);
+box-shadow: var(--shadow-xl);
+
+/* Menu Item Icon */
+width: 20px;
+height: 20px;
+color: var(--primary-500);
+
+/* Menu Item Text */
+font-size: var(--text-base);
+font-weight: var(--font-medium);
+color: var(--gray-900);
+
+/* Backdrop */
+position: fixed;
+top: 0;
+left: 0;
+right: 0;
+bottom: 0;
+background: transparent;
+z-index: -1;
+```
+
+---
+
+## 3. Page Layouts 頁面佈局
+
+### 3.1 Responsive Breakpoints 響應式斷點
+
+```css
+/* Mobile */
+@media (max-width: 767px) {
+  /* 375px - 767px */
+}
+
+/* Tablet */
+@media (min-width: 768px) and (max-width: 1023px) {
+  /* 768px - 1023px */
+}
+
+/* Desktop */
+@media (min-width: 1024px) {
+  /* 1024px+ */
+}
+```
+
+---
+
+### 3.2 Landing Page 旅程列表頁
+
+#### Layout Structure 佈局結構
+```
+┌─────────────────────────────────────────┐
+│ Header (64px)                           │
+├─────────────────────────────────────────┤
+│                                         │
+│ Content (padding: 24px)                 │
+│                                         │
+│ ┌─────┐ ┌─────┐ ┌─────┐                │
+│ │Card │ │Card │ │Card │                │
+│ └─────┘ └─────┘ └─────┘                │
+│                                         │
+└─────────────────────────────────────────┘
+```
+
+#### Header 頁首
+```css
+/* Container */
+height: 64px;
+padding: 0 var(--space-6);
+background: var(--surface-primary);
+border-bottom: 1px solid var(--gray-200);
+display: flex;
+align-items: center;
+justify-content: space-between;
+
+/* Logo */
+font-size: var(--text-2xl);
+font-weight: var(--font-bold);
+color: var(--primary-500);
+
+/* User Menu */
+display: flex;
+align-items: center;
+gap: var(--space-4);
+
+/* Avatar */
+width: 40px;
+height: 40px;
+border-radius: var(--radius-full);
+background: var(--primary-100);
+color: var(--primary-700);
+display: flex;
+align-items: center;
+justify-content: center;
+font-weight: var(--font-semibold);
+cursor: pointer;
+```
+
+#### Content Area 內容區域
+```css
+/* Container */
+padding: var(--space-6);
+max-width: 1200px;
+margin: 0 auto;
+
+/* Title */
+font-size: var(--text-3xl);
+font-weight: var(--font-bold);
+color: var(--gray-900);
+margin-bottom: var(--space-6);
+
+/* Trip Grid */
+display: grid;
+grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+gap: var(--space-6);
+
+/* Mobile */
+@media (max-width: 767px) {
+  grid-template-columns: 1fr;
+}
+```
+
+---
+
+### 3.3 Map Page 地圖頁面
+
+#### Layout Structure 佈局結構（桌面版）
+```
+┌─────────────────────────────────────────┐
+│ Header (64px)                           │
+├──────────────────────┬──────────────────┤
+│                      │                  │
+│                      │  Sidebar         │
+│   Map (70%)          │  (30%, 360px)    │
+│                      │                  │
+│                      │                  │
+└──────────────────────┴──────────────────┘
+```
+
+#### Layout Structure 佈局結構（手機版）
+```
+┌─────────────────────────────────────────┐
+│ Header (56px)                           │
+├─────────────────────────────────────────┤
+│                                         │
+│                                         │
+│   Map (100%)                            │
+│                                         │
+│                                         │
+├─────────────────────────────────────────┤
+│ Bottom Sheet (160px, expandable)       │
+└─────────────────────────────────────────┘
+```
+
+#### Sidebar 側邊欄（桌面版）
+```css
+/* Container */
+width: 360px;
+height: calc(100vh - 64px);
+background: var(--surface-secondary);
+border-left: 1px solid var(--gray-200);
+display: flex;
+flex-direction: column;
+overflow: hidden;
+
+/* Header */
+padding: var(--space-6);
+border-bottom: 1px solid var(--gray-200);
+
+/* Trip Title */
+font-size: var(--text-xl);
+font-weight: var(--font-semibold);
+color: var(--gray-900);
+margin-bottom: var(--space-2);
+
+/* Place Count */
+font-size: var(--text-sm);
+color: var(--gray-500);
+
+/* Collapse Button */
+position: absolute;
+top: var(--space-6);
+left: -16px;
+width: 32px;
+height: 32px;
+background: var(--surface-primary);
+border: 1px solid var(--gray-200);
+border-radius: var(--radius-full);
+display: flex;
+align-items: center;
+justify-content: center;
+cursor: pointer;
+box-shadow: var(--shadow-md);
+
+/* List Container */
+flex: 1;
+overflow-y: auto;
+padding: var(--space-4);
+
+/* List Item */
+padding: var(--space-4);
+background: var(--surface-primary);
+border-radius: var(--radius-md);
+margin-bottom: var(--space-3);
+cursor: pointer;
+transition: all var(--duration-fast) var(--ease-out);
+
+/* List Item Hover */
+background: var(--primary-50);
+box-shadow: var(--shadow-sm);
+
+/* List Item Selected */
+background: var(--primary-100);
+border: 2px solid var(--primary-500);
+```
+
+#### Bottom Sheet 底部面板（手機版）
+```css
+/* Container */
+position: fixed;
+bottom: 0;
+left: 0;
+right: 0;
+background: var(--surface-primary);
+border-top-left-radius: var(--radius-xl);
+border-top-right-radius: var(--radius-xl);
+box-shadow: 0 -4px 6px -1px rgba(0, 0, 0, 0.1);
+transition: height var(--duration-slow) var(--ease-out);
+z-index: 100;
+
+/* Default Height */
+height: 160px;
+
+/* Expanded Height */
+height: 80vh;
+
+/* Handle */
+width: 40px;
+height: 4px;
+background: var(--gray-300);
+border-radius: var(--radius-full);
+margin: var(--space-3) auto;
+cursor: grab;
+
+/* Handle Active */
+cursor: grabbing;
+```
+
+---
+
+## 4. Animation Specifications 動畫規格
+
+### 4.1 Page Transitions 頁面轉場
+
+#### Fade Transition 淡入淡出
+```css
+.fade-enter {
+  opacity: 0;
+}
+
+.fade-enter-active {
+  opacity: 1;
+  transition: opacity var(--duration-normal) var(--ease-out);
+}
+
+.fade-exit {
+  opacity: 1;
+}
+
+.fade-exit-active {
+  opacity: 0;
+  transition: opacity var(--duration-normal) var(--ease-in);
+}
+```
+
+#### Slide Transition 滑動
+```css
+.slide-enter {
+  transform: translateX(100%);
+}
+
+.slide-enter-active {
+  transform: translateX(0);
+  transition: transform var(--duration-slow) var(--ease-out);
+}
+
+.slide-exit {
+  transform: translateX(0);
+}
+
+.slide-exit-active {
+  transform: translateX(-100%);
+  transition: transform var(--duration-slow) var(--ease-in);
+}
+```
+
+---
+
+### 4.2 Micro-interactions 微互動
+
+#### Button Click 按鈕點擊
+```css
+@keyframes buttonClick {
+  0% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(0.95);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+button:active {
+  animation: buttonClick var(--duration-fast) var(--ease-in-out);
+}
+```
+
+#### Card Hover 卡片懸停
+```css
+.card {
+  transition: all var(--duration-normal) var(--ease-out);
+}
+
+.card:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-lg);
+}
+```
+
+#### Pin Bounce 標記彈跳
+```css
+@keyframes pinBounce {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
+.pin.new {
+  animation: pinBounce 0.6s var(--ease-bounce);
+}
+```
+
+---
+
+## 5. Accessibility 無障礙設計
+
+### 5.1 Color Contrast 色彩對比
+
+所有文字與背景的對比度必須符合 WCAG 2.1 AA 標準：
+- **正常文字**：至少 4.5:1
+- **大文字（18px+ 或 14px+ bold）**：至少 3:1
+
+### 5.2 Focus States 焦點狀態
+
+所有可互動元素必須有明顯的焦點狀態：
+```css
+:focus-visible {
+  outline: 2px solid var(--primary-500);
+  outline-offset: 2px;
+}
+```
+
+### 5.3 Touch Targets 觸控目標
+
+所有可點擊元素的最小尺寸：
+- **手機**：44x44px
+- **桌面**：32x32px
+
+---
+
+## 附錄
+
+### A. Design Tokens 設計標記
+
+完整的 Design Tokens 可匯出為 JSON 格式，供開發團隊使用：
+```json
+{
+  "colors": {
+    "primary": {
+      "500": "#3B82F6"
+    }
+  },
+  "spacing": {
+    "4": "1rem"
+  },
+  "typography": {
+    "base": {
+      "fontSize": "1rem",
+      "lineHeight": "1.5"
+    }
+  }
+}
+```
+
+### B. 參考文件
+- [PRD.md](./PRD.md)：產品需求文件
+- [FUNCTIONAL_SPEC.md](./FUNCTIONAL_SPEC.md)：功能規格
+- [TECH_SPEC.md](./TECH_SPEC.md)：技術規格
