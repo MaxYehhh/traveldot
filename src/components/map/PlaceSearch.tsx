@@ -79,7 +79,7 @@ export const PlaceSearch = ({ onClose }: PlaceSearchProps) => {
         setIsLoading(true)
         const request = {
             placeId: prediction.place_id,
-            fields: ['place_id', 'name', 'geometry', 'formatted_address', 'photos'],
+            fields: ['place_id', 'name', 'geometry', 'formatted_address', 'photos', 'rating', 'types'],
             sessionToken: sessionToken,
         }
 
@@ -102,6 +102,7 @@ export const PlaceSearch = ({ onClose }: PlaceSearchProps) => {
                 // Extract photos
                 const photos = place.photos?.slice(0, 3).map((photo) => photo.getUrl({ maxWidth: 800 }) || '') || [];
                 const photo_refs = place.photos?.slice(0, 3).map((photo) => (photo as any).photo_reference).filter(Boolean) || [];
+                const tags = place.types || [];
 
                 setSelectedPlace({
                     id: place.place_id!,
@@ -111,6 +112,7 @@ export const PlaceSearch = ({ onClose }: PlaceSearchProps) => {
                     photos: photos,
                     photo_refs: photo_refs,
                     rating: place.rating,
+                    tags: tags,
                 })
 
                 // Clear Search
