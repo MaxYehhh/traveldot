@@ -31,6 +31,7 @@ export const MapEventHandler = () => {
                             },
                             address: placeResult.formatted_address,
                             photos: placeResult.photos?.slice(0, 3).map(p => p.getUrl({ maxWidth: 400 })).filter(Boolean) as string[],
+                            photo_refs: placeResult.photos?.slice(0, 3).map(p => (p as any).photo_reference).filter(Boolean) as string[],
                             rating: placeResult.rating
                         }
 

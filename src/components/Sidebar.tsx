@@ -154,9 +154,13 @@ export const Sidebar = () => {
 
                             {/* Thumbnail */}
                             <div className="w-16 h-16 rounded-lg bg-gray-100 overflow-hidden flex-shrink-0">
-                                {place.photos && place.photos.length > 0 ? (
+                                {(place.photo_refs && place.photo_refs.length > 0) || (place.photos && place.photos.length > 0) ? (
                                     <img
-                                        src={place.photos[0]}
+                                        src={
+                                            place.photo_refs && place.photo_refs.length > 0
+                                                ? `https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photoreference=${place.photo_refs[0]}&key=${import.meta.env.VITE_GOOGLE_MAPS_API_KEY}`
+                                                : place.photos![0]
+                                        }
                                         alt={place.name}
                                         className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
                                     />

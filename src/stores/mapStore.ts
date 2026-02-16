@@ -11,6 +11,7 @@ export interface Place {
     location: Location
     address?: string
     photos?: string[]
+    photo_refs?: string[]
     color?: string
     // Phase 2 fields
     rating?: number

@@ -75,7 +75,15 @@ export const PlacePreview = () => {
         }
     }
 
-    const hasPhotos = displayPlace.photos && displayPlace.photos.length > 0
+    const hasPhotos = (displayPlace.photos && displayPlace.photos.length > 0) || (displayPlace.photo_refs && displayPlace.photo_refs.length > 0)
+
+    // Helper to get stable URL if ref exists, otherwise use legacy URL
+    const getPhotoUrl = (index: number) => {
+        if (displayPlace.photo_refs && displayPlace.photo_refs[index]) {
+            return `https://maps.googleapis.com/maps/api/place/photo?maxwidth=800&photoreference=${displayPlace.photo_refs[index]}&key=${import.meta.env.VITE_GOOGLE_MAPS_API_KEY}`
+        }
+        return displayPlace.photos ? displayPlace.photos[index] : ''
+    }
 
     return (
         <div
@@ -92,7 +100,7 @@ export const PlacePreview = () => {
             <div className="absolute inset-0">
                 {hasPhotos ? (
                     <img
-                        src={displayPlace.photos![currentPhotoIndex]}
+                        src={getPhotoUrl(currentPhotoIndex)}
                         alt={displayPlace.name}
                         className="w-full h-full object-cover transition-opacity duration-300"
                     />
