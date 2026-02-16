@@ -98,11 +98,19 @@ export const PlaceSearch = ({ onClose }: PlaceSearchProps) => {
 
                 // Update Store
                 setMapState({ currentLocation: { lat, lng }, zoom: 15 })
+
+                // Extract photos
+                const photos = place.photos?.slice(0, 3).map((photo) => photo.getUrl({ maxWidth: 800 }) || '') || [];
+                const photo_refs = place.photos?.slice(0, 3).map((photo) => (photo as any).photo_reference).filter(Boolean) || [];
+
                 setSelectedPlace({
                     id: place.place_id!,
                     name: place.name!,
                     location: { lat, lng },
                     address: place.formatted_address,
+                    photos: photos,
+                    photo_refs: photo_refs,
+                    rating: place.rating,
                 })
 
                 // Clear Search
