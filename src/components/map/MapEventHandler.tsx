@@ -30,7 +30,7 @@ export const MapEventHandler = () => {
                                 lng: placeResult.geometry.location.lng()
                             },
                             address: placeResult.formatted_address,
-                            photos: placeResult.photos?.map(p => p.getUrl({ maxWidth: 400 })).filter(Boolean) as string[],
+                            photos: placeResult.photos?.slice(0, 3).map(p => p.getUrl({ maxWidth: 400 })).filter(Boolean) as string[],
                             rating: placeResult.rating
                         }
 

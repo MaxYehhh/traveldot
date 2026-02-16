@@ -1,18 +1,17 @@
 
+import { lazy, Suspense, useEffect } from 'react'
 import { MapContainer } from '@/components/map/MapContainer'
 import { Sidebar } from '@/components/Sidebar'
-import { PlaceEditor } from '@/components/PlaceEditor'
 import { useMapStore } from '@/stores/mapStore'
 import { useAuthStore } from '@/stores/authStore'
-import { AuthPage } from '@/components/auth/AuthPage'
 import { MapSkeleton } from '@/components/ui/MapSkeleton'
 import { cn } from '@/lib/utils'
-
 import { useTripStore } from '@/stores/tripStore'
 import { MapDataManager } from '@/components/map/MapDataManager'
-import { useEffect } from 'react'
-
 import { Toaster } from 'sonner'
+
+const AuthPage = lazy(() => import('@/components/auth/AuthPage').then(m => ({ default: m.AuthPage })))
+const PlaceEditor = lazy(() => import('@/components/PlaceEditor').then(m => ({ default: m.PlaceEditor })))
 
 function App() {
   const { isSidebarOpen } = useMapStore()
@@ -58,7 +57,9 @@ function App() {
     return (
       <>
         <Toaster position="top-center" />
-        <AuthPage />
+        <Suspense fallback={<MapSkeleton />}>
+          <AuthPage />
+        </Suspense>
       </>
     )
   }
@@ -81,7 +82,9 @@ function App() {
       <Sidebar />
 
       {/* Editor Modal */}
-      <PlaceEditor />
+      <Suspense fallback={null}>
+        <PlaceEditor />
+      </Suspense>
     </div>
   )
 }

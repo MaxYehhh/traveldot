@@ -30,7 +30,7 @@ export const getPlaceDetails = async (
                 ) {
                     // Extract photos
                     const photos =
-                        result.photos?.map((photo) => photo.getUrl({ maxWidth: 800 }) || '') || [];
+                        result.photos?.slice(0, 3).map((photo) => photo.getUrl({ maxWidth: 800 }) || '') || [];
 
                     // Extract tags (using types as tags for now)
                     const tags = result.types || [];
