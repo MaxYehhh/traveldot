@@ -42,6 +42,13 @@ export const PlaceEditor = () => {
     const [errors, setErrors] = useState<{ name?: string }>({})
     const [isSubmitting, setIsSubmitting] = useState(false)
 
+    // Stable ref: stores the place ID being edited when the editor opens.
+    // Prevents selectedPlace from being mutated mid-edit (e.g. map click in panel mode)
+    // from accidentally routing handleSave into createPlace instead of updatePlace.
+    const editingPlaceIdRef = useRef<string | null>(null)
+    const editingLocationRef = useRef<{ lat: number; lng: number } | null>(null)
+    const editingAddressRef = useRef<string>('')
+
     const layoutMode = editorLayoutMode
     const setLayoutMode = setEditorLayoutMode
     const [panelWidth, setPanelWidth] = useState(480)
@@ -77,6 +84,11 @@ export const PlaceEditor = () => {
     // Reset/Pre-fill form when opening
     useEffect(() => {
         if (isEditorOpen && editorMode === 'edit' && selectedPlace) {
+            // Lock the editing target so map interactions (panel mode) can't change the save target
+            editingPlaceIdRef.current = selectedPlace.id
+            editingLocationRef.current = selectedPlace.location
+            editingAddressRef.current = selectedPlace.address || ''
+
             setName(selectedPlace.name)
             // Parse content: check if object (new schema) or string (legacy)
             const unsafeContent: any = selectedPlace.content
@@ -92,6 +104,10 @@ export const PlaceEditor = () => {
             setColor(selectedPlace.color || DEFAULT_PLACE_COLOR)
             setErrors({})
         } else if (isEditorOpen && editorMode === 'add') {
+            editingPlaceIdRef.current = null
+            editingLocationRef.current = selectedPlace?.location ?? null
+            editingAddressRef.current = selectedPlace?.address || ''
+
             setName(selectedPlace?.name || '')
             setContent('')
             setPhotos([])
@@ -203,11 +219,16 @@ export const PlaceEditor = () => {
             const existingdbPhotos = photos.filter(p => p.startsWith('http'))
             const finalPhotos = [...existingdbPhotos, ...uploadedPhotoUrls]
 
-            const placeData = {
+            // Use stable refs captured at editor-open time to avoid stale state from map interactions
+        const stableEditingId = editingPlaceIdRef.current
+        const stableLocation = editingLocationRef.current ?? { lat: 13.7563, lng: 100.5018 }
+        const stableAddress = editingAddressRef.current
+
+        const placeData = {
                 tripId: tripId,
                 name,
-                coordinates: editorMode === 'edit' && selectedPlace ? selectedPlace.location : { lat: 13.7563, lng: 100.5018 },
-                address: editorMode === 'edit' && selectedPlace ? (selectedPlace.address || '') : '',
+                coordinates: stableLocation,
+                address: stableAddress,
                 visitedDate: new Date(visitedDate),
                 color, // Phase 2: Custom Color
                 content: {
@@ -225,14 +246,16 @@ export const PlaceEditor = () => {
 
             // 2. Save to Firestore (Wrapped in Timeout)
             let savedPlaceId: string;
-            if (editorMode === 'edit' && selectedPlace) {
+            if (stableEditingId) {
+                // Edit mode: always update the specific place locked in at editor-open time
                 await withTimeout(
-                    updatePlace(currentUser.uid, tripId, selectedPlace.id, placeData),
+                    updatePlace(currentUser.uid, tripId, stableEditingId, placeData),
                     10000,
                     '資料儲存回應過慢 (超過10秒)，可能是網路不穩或後端無回應'
                 );
-                savedPlaceId = selectedPlace.id;
+                savedPlaceId = stableEditingId;
             } else {
+                // Add mode: create new place
                 savedPlaceId = await withTimeout(
                     createPlace(currentUser.uid, tripId, placeData),
                     10000,
@@ -255,7 +278,7 @@ export const PlaceEditor = () => {
             };
             setSelectedPlace(savedPlace);
 
-            if (editorMode === 'edit') {
+            if (stableEditingId) {
                 toast.success('地點已更新')
             } else {
                 toast.success('地點已新增')

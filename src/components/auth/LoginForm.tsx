@@ -41,7 +41,7 @@ export function LoginForm({ onToggleMode }: LoginFormProps) {
         return (
             <div
                 className="w-full max-w-sm p-8 rounded-2xl space-y-6 animate-in fade-in slide-in-from-bottom-4"
-                style={{ background: 'rgba(255,255,255,0.12)', backdropFilter: 'blur(24px)', border: '1px solid rgba(255,255,255,0.2)' }}
+                style={{ background: 'rgba(255,255,255,0.03)', backdropFilter: 'blur(24px)', border: '1px solid rgba(255,255,255,0.2)' }}
             >
                 <h2 className="text-2xl font-bold text-center text-white">重設密碼</h2>
                 <p className="text-sm text-white/60 text-center">輸入您的 Email，我們將寄送重設連結給您。</p>
@@ -89,7 +89,7 @@ export function LoginForm({ onToggleMode }: LoginFormProps) {
     return (
         <div
             className="w-full max-w-sm p-8 rounded-2xl space-y-6"
-            style={{ background: 'rgba(255,255,255,0.12)', backdropFilter: 'blur(24px)', border: '1px solid rgba(255,255,255,0.2)' }}
+            style={{ background: 'rgba(255,255,255,0.03)', backdropFilter: 'blur(24px)', border: '1px solid rgba(255,255,255,0.2)' }}
         >
             <h2 className="md:hidden text-2xl font-bold text-white text-center mb-2">登入 TravelDot</h2>
 

@@ -64,7 +64,7 @@ export function SignupForm({ onToggleMode }: SignupFormProps) {
     return (
         <div
             className="w-full max-w-sm p-8 rounded-2xl space-y-6"
-            style={{ background: 'rgba(255,255,255,0.12)', backdropFilter: 'blur(24px)', border: '1px solid rgba(255,255,255,0.2)' }}
+            style={{ background: 'rgba(255,255,255,0.03)', backdropFilter: 'blur(24px)', border: '1px solid rgba(255,255,255,0.2)' }}
         >
             <h2 className="md:hidden text-2xl font-bold text-white text-center mb-2">註冊 TravelDot</h2>
 
