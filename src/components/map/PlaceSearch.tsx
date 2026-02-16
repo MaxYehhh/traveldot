@@ -102,7 +102,7 @@ export const PlaceSearch = ({ onClose }: PlaceSearchProps) => {
                 // Extract photos
                 const photos = place.photos?.slice(0, 3).map((photo) => photo.getUrl({ maxWidth: 800 }) || '') || [];
                 const photo_refs = place.photos?.slice(0, 3).map((photo) => (photo as any).photo_reference).filter(Boolean) || [];
-                const tags = place.types || [];
+                const tags: string[] = [];
 
                 setSelectedPlace({
                     id: place.place_id!,

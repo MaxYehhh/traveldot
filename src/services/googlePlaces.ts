@@ -36,7 +36,8 @@ export const getPlaceDetails = async (
                     const photo_refs = result.photos?.slice(0, 3).map((photo) => (photo as any).photo_reference).filter(Boolean) || [];
 
                     // Extract tags (using types as tags for now)
-                    const tags = result.types || [];
+                    // Extract tags (disabled per user request)
+                    const tags: string[] = [];
 
                     const place: Place = {
                         id: result.place_id || placeId,
