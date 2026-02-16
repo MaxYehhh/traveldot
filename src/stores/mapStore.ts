@@ -58,8 +58,8 @@ interface MapActions {
     setEditorLayoutMode: (mode: 'popup' | 'panel') => void
 }
 
-const DEFAULT_CENTER = { lat: 13.7563, lng: 100.5018 };
-const DEFAULT_ZOOM = 12;
+const DEFAULT_CENTER = { lat: 23.6978, lng: 120.9605 }; // Taiwan Center
+const DEFAULT_ZOOM = 8; // Zoom level to see the whole island
 
 export const useMapStore = create<MapState & MapActions>((set) => ({
     // Default to Bangkok
