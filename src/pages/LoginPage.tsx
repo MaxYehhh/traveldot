@@ -50,17 +50,6 @@ export default function LoginPage() {
                 <div className="w-full max-w-[420px] px-6">
                     <LoginForm onToggleMode={handleToggleMode} />
                 </div>
-
-                {/* Register link (visible on md+, LoginForm hides its own link on md+) */}
-                <div className="relative z-10 mt-4 text-sm hidden md:block">
-                    <span className="text-white/60">還沒有帳號？</span>{' '}
-                    <Link
-                        to="/register"
-                        className="font-medium text-blue-300 hover:text-blue-200 underline transition-colors"
-                    >
-                        立即註冊
-                    </Link>
-                </div>
             </div>
         </div>
     )
