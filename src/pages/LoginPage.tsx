@@ -37,11 +37,13 @@ export default function LoginPage() {
             <div className="relative z-10 flex flex-col items-center justify-center h-full gap-0">
                 {/* Logo */}
                 <div className="flex flex-col items-center -mb-32">
-                    <img
-                        src={logoAuth}
-                        alt="TravelDot"
-                        className="w-[400px] object-contain drop-shadow-lg"
-                    />
+                    <Link to="/home">
+                        <img
+                            src={logoAuth}
+                            alt="TravelDot"
+                            className="w-[400px] object-contain drop-shadow-lg hover:opacity-90 transition-opacity cursor-pointer"
+                        />
+                    </Link>
                 </div>
 
                 {/* Form */}

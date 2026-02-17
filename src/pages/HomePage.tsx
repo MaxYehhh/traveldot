@@ -1,5 +1,6 @@
 import { useNavigate, Link } from 'react-router-dom'
 import { useAuthStore } from '@/stores/authStore'
+import logoHome from '@/assets/logo_home.png'
 
 const features = [
     {
@@ -37,9 +38,7 @@ export default function HomePage() {
             <nav className="sticky top-0 z-50 bg-white shadow-sm h-16 flex items-center px-6 md:px-12">
                 <div className="max-w-6xl mx-auto w-full flex items-center justify-between">
                     {/* Logo */}
-                    <span className="text-xl font-bold text-blue-600 select-none">
-                        📍 TravelDot
-                    </span>
+                    <img src={logoHome} alt="TravelDot" className="h-8 object-contain" />
 
                     {/* Right side nav actions */}
                     <div className="flex items-center gap-3">
@@ -170,7 +169,7 @@ export default function HomePage() {
             {/* Footer */}
             <footer className="py-8 px-6 bg-gray-50 border-t border-gray-100 mt-auto">
                 <p className="text-center text-gray-400 text-sm">
-                    © 2024 TravelDot. All rights reserved.
+                    © 2026 TravelDot. All rights reserved.
                 </p>
             </footer>
         </div>
