@@ -1,91 +1,42 @@
-
-import { lazy, Suspense, useEffect } from 'react'
-import { MapContainer } from '@/components/map/MapContainer'
-import { Sidebar } from '@/components/Sidebar'
-import { useMapStore } from '@/stores/mapStore'
-import { useAuthStore } from '@/stores/authStore'
-import { MapSkeleton } from '@/components/ui/MapSkeleton'
-import { cn } from '@/lib/utils'
-import { useTripStore } from '@/stores/tripStore'
-import { MapDataManager } from '@/components/map/MapDataManager'
+import { lazy, Suspense } from 'react'
+import { Routes, Route, Navigate } from 'react-router-dom'
 import { Toaster } from 'sonner'
+import { ProtectedRoute } from '@/components/routing/ProtectedRoute'
+import { PublicOnlyRoute } from '@/components/routing/PublicOnlyRoute'
+import { MapSkeleton } from '@/components/ui/MapSkeleton'
 
-const AuthPage = lazy(() => import('@/components/auth/AuthPage').then(m => ({ default: m.AuthPage })))
-const PlaceEditor = lazy(() => import('@/components/PlaceEditor').then(m => ({ default: m.PlaceEditor })))
+const LoginPage = lazy(() => import('@/pages/LoginPage'))
+const RegisterPage = lazy(() => import('@/pages/RegisterPage'))
+const MapPage = lazy(() => import('@/pages/MapPage'))
+const HomePage = lazy(() => import('@/pages/HomePage'))
+const ProfilePage = lazy(() => import('@/pages/ProfilePage'))
 
 function App() {
-  const { isSidebarOpen } = useMapStore()
-  const { currentUser, isInitialized } = useAuthStore()
-  const { fetchTrips, trips, createTrip } = useTripStore()
-
-  // Auto-fetch trips or create default one
-  useEffect(() => {
-    if (currentUser) {
-      fetchTrips().then(() => {
-        // Check if trips are empty/loaded in store state?
-        // fetchTrips sets trips in store.
-        // Accessing store state inside effect requires dependency or getState.
-        // Better: check trips length after fetch? fetchTrips doesn't return value.
-        // We can check `trips` dependency.
-      })
-    }
-  }, [currentUser, fetchTrips])
-
-  // Create default trip if none exists (MVP feature)
-  useEffect(() => {
-    const state = useTripStore.getState();
-    // Only auto-create if: 
-    // 1. User is logged in
-    // 2. Not already loading
-    // 3. No trips exist
-    // 4. We prevent infinite loop by ensuring we don't call if we just called it (handled by dependency array usually, or loading state)
-    if (currentUser && !state.loading && trips.length === 0) {
-      createTrip('My First Trip', new Date(), new Date())
-    }
-  }, [currentUser, trips.length]) // Only check length changes
-
-  if (!isInitialized) {
-    return (
-      <>
-        <Toaster position="top-center" />
-        <MapSkeleton />
-      </>
-    )
-  }
-
-  if (!currentUser) {
-    return (
-      <>
-        <Toaster position="top-center" />
-        <Suspense fallback={<MapSkeleton />}>
-          <AuthPage />
-        </Suspense>
-      </>
-    )
-  }
-
   return (
-    <div className="h-screen w-screen overflow-hidden flex bg-gray-50">
+    <>
       <Toaster position="top-center" />
-      <MapDataManager />
-      {/* Map Area - Adjusts width based on sidebar */}
-      <div
-        className={cn(
-          "h-full transition-all duration-300 ease-in-out relative",
-          isSidebarOpen ? "md:ml-[360px] md:w-[calc(100%-360px)] w-full" : "w-full"
-        )}
-      >
-        <MapContainer />
-      </div>
+      <Suspense fallback={<MapSkeleton />}>
+        <Routes>
+          {/* 根路徑重定向 */}
+          <Route path="/" element={<Navigate to="/home" replace />} />
 
-      {/* Sidebar */}
-      <Sidebar />
+          {/* 公開頁面 */}
+          <Route path="/home" element={<HomePage />} />
 
-      {/* Editor Modal */}
-      <Suspense fallback={null}>
-        <PlaceEditor />
+          {/* 已登入才能訪問的公開頁面（登入後跳轉 /map） */}
+          <Route element={<PublicOnlyRoute />}>
+            <Route path="/login" element={<LoginPage />} />
+            <Route path="/register" element={<RegisterPage />} />
+          </Route>
+
+          {/* 受保護頁面 */}
+          <Route element={<ProtectedRoute />}>
+            <Route path="/map" element={<MapPage />} />
+            <Route path="/profile" element={<ProfilePage />} />
+          </Route>
+        </Routes>
       </Suspense>
-    </div>
+    </>
   )
 }
 

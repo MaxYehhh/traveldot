@@ -1,5 +1,5 @@
 import { create } from 'zustand';
-import { TripData, getTrips, createTrip } from '@/services/firestore';
+import { TripData, getTrips, createTrip, updateTrip as firestoreUpdateTrip, deleteTrip as firestoreDeleteTrip } from '@/services/firestore';
 import { useAuthStore } from './authStore';
 
 interface TripState {
@@ -12,6 +12,8 @@ interface TripState {
 interface TripActions {
     fetchTrips: () => Promise<void>;
     createTrip: (title: string, startDate: Date, endDate: Date) => Promise<void>;
+    updateTrip: (tripId: string, updates: Partial<TripData>) => Promise<void>;
+    deleteTrip: (tripId: string) => Promise<void>;
     setCurrentTrip: (trip: TripData | null) => void;
 }
 
@@ -56,6 +58,50 @@ export const useTripStore = create<TripState & TripActions>((set, get) => ({
             await get().fetchTrips();
         } catch (error: any) {
             set({ error: error.message });
+        } finally {
+            set({ loading: false });
+        }
+    },
+
+    updateTrip: async (tripId, updates) => {
+        const user = useAuthStore.getState().currentUser;
+        if (!user) return;
+
+        set({ loading: true, error: null });
+        try {
+            await firestoreUpdateTrip(user.uid, tripId, updates);
+            await get().fetchTrips();
+            // If the updated trip is currently selected, also update currentTrip in-place
+            const currentTrip = get().currentTrip;
+            if (currentTrip?.id === tripId) {
+                const refreshed = get().trips.find(t => t.id === tripId) ?? null;
+                set({ currentTrip: refreshed });
+            }
+        } catch (error: any) {
+            set({ error: error.message });
+            throw error;
+        } finally {
+            set({ loading: false });
+        }
+    },
+
+    deleteTrip: async (tripId) => {
+        const user = useAuthStore.getState().currentUser;
+        if (!user) return;
+
+        set({ loading: true, error: null });
+        try {
+            await firestoreDeleteTrip(user.uid, tripId);
+            await get().fetchTrips();
+            // If deleted trip was the current trip, switch to first remaining or null
+            const currentTrip = get().currentTrip;
+            if (currentTrip?.id === tripId) {
+                const remaining = get().trips;
+                set({ currentTrip: remaining.length > 0 ? remaining[0] : null });
+            }
+        } catch (error: any) {
+            set({ error: error.message });
+            throw error;
         } finally {
             set({ loading: false });
         }

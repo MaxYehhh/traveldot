@@ -6,7 +6,7 @@ import { useEffect, useRef } from 'react'
 export const MapMarkers = () => {
     const map = useMap()
     const markerLib = useMapsLibrary('marker') // Wait for marker library to be ready
-    const { selectedPlace, places } = useMapStore()
+    const { selectedPlace, allPlaces: places } = useMapStore()
     const markersRef = useRef<{ [key: string]: google.maps.marker.AdvancedMarkerElement }>({})
 
     // Sync markers imperatively to avoid re-render performance issues

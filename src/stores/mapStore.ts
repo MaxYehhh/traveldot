@@ -13,6 +13,7 @@ export interface Place {
     photos?: string[]
     photo_refs?: string[]
     color?: string
+    tripId?: string
     // Phase 2 fields
     rating?: number
     tags?: string[]
@@ -40,6 +41,13 @@ interface MapState {
     isEditorOpen: boolean
     editorMode: 'add' | 'edit'
     editorLayoutMode: 'popup' | 'panel'
+
+    // Phase 4 UI State
+    viewMode: 'map' | 'list'
+    activeTagFilters: string[]
+
+    editorPanelWidth: number
+    allPlaces: Place[]
 }
 
 interface MapActions {
@@ -56,6 +64,14 @@ interface MapActions {
     openEditor: (mode: 'add' | 'edit') => void
     closeEditor: () => void
     setEditorLayoutMode: (mode: 'popup' | 'panel') => void
+
+    // Phase 4 UI Actions
+    setViewMode: (mode: 'map' | 'list') => void
+    setTagFilters: (tags: string[]) => void
+    clearTagFilters: () => void
+
+    setEditorPanelWidth: (w: number) => void
+    setAllPlaces: (places: Place[]) => void
 }
 
 const DEFAULT_CENTER = { lat: 23.6978, lng: 120.9605 }; // Taiwan Center
@@ -75,6 +91,13 @@ export const useMapStore = create<MapState & MapActions>((set) => ({
     isEditorOpen: false,
     editorMode: 'add',
     editorLayoutMode: 'popup',
+
+    // Phase 4 defaults
+    viewMode: 'map',
+    activeTagFilters: [],
+
+    editorPanelWidth: 480,
+    allPlaces: [],
 
     setMapState: (state) => set((s) => ({ ...s, ...state })),
     setMapCenter: (center) => set(() => ({ mapCenter: center })),
@@ -96,6 +119,14 @@ export const useMapStore = create<MapState & MapActions>((set) => ({
     toggleSidebar: () => set((s) => ({ isSidebarOpen: !s.isSidebarOpen })),
     setSidebarOpen: (isOpen) => set(() => ({ isSidebarOpen: isOpen })),
     openEditor: (mode) => set(() => ({ isEditorOpen: true, editorMode: mode })),
-    closeEditor: () => set(() => ({ isEditorOpen: false })),
+    closeEditor: () => set(() => ({ isEditorOpen: false, editorPanelWidth: 0 })),
     setEditorLayoutMode: (mode) => set(() => ({ editorLayoutMode: mode })),
+
+    // Phase 4 implementations
+    setViewMode: (mode) => set(() => ({ viewMode: mode })),
+    setTagFilters: (tags) => set(() => ({ activeTagFilters: tags })),
+    clearTagFilters: () => set(() => ({ activeTagFilters: [] })),
+
+    setEditorPanelWidth: (w) => set(() => ({ editorPanelWidth: w })),
+    setAllPlaces: (places) => set(() => ({ allPlaces: places })),
 }))

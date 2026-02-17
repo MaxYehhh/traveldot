@@ -12,10 +12,11 @@ export const PlacePreview = () => {
         selectedPlace,
         setSelectedPlace,
         openEditor,
-        deletePlace
+        deletePlace,
+        allPlaces
     } = useMapStore()
     const { currentUser } = useAuthStore()
-    const { currentTrip } = useTripStore()
+    const { trips } = useTripStore()
     const [currentPhotoIndex, setCurrentPhotoIndex] = useState(0)
     const [isClosing, setIsClosing] = useState(false)
 
@@ -45,6 +46,11 @@ export const PlacePreview = () => {
             setIsClosing(false)
         }, 200) // Match animation duration
     }
+
+    // Find which trip this place belongs to
+    const savedPlace = allPlaces.find(p => p.id === selectedPlace.id)
+    const placeTripId = savedPlace?.tripId
+    const placeTripName = placeTripId ? trips.find(t => t.id === placeTripId)?.title : null
 
     // Display data (remove mock defaults per AC-034)
     const displayPlace = {
@@ -165,6 +171,16 @@ export const PlacePreview = () => {
                     </div>
                 )}
 
+                {/* Trip badge */}
+                {placeTripName && (
+                    <div className="flex items-center gap-1.5 mb-2">
+                        <span className="inline-flex items-center gap-1 px-2.5 py-0.5 bg-white/20 text-white/90 text-xs font-medium rounded-full backdrop-blur-sm">
+                            <MapPin size={10} />
+                            {placeTripName}
+                        </span>
+                    </div>
+                )}
+
                 {/* Place name */}
                 <h2 className="text-2xl font-bold text-white leading-tight mb-1">
                     {displayPlace.name}
@@ -210,15 +226,15 @@ export const PlacePreview = () => {
 
                 {/* Action buttons */}
                 <div className="flex items-center gap-3 mt-3">
-                    {/* Delete: Only show if place is saved (has ID in store) */}
-                    {useMapStore.getState().places.find(p => p.id === selectedPlace.id) && (
+                    {/* Delete: Only show if place is saved (has ID in allPlaces) */}
+                    {savedPlace && placeTripId && (
                         <button
                             onClick={async (e) => {
                                 e.stopPropagation()
-                                if (!currentUser || !currentTrip?.id) return
+                                if (!currentUser) return
                                 if (confirm('確定要刪除這個地點嗎？')) {
                                     try {
-                                        await deletePlaceService(currentUser.uid, currentTrip.id, selectedPlace.id)
+                                        await deletePlaceService(currentUser.uid, placeTripId, selectedPlace.id)
                                         deletePlace(selectedPlace.id)
                                         setSelectedPlace(null)
                                         toast.success('地點已刪除')

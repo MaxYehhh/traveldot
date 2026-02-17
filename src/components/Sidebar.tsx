@@ -1,47 +1,46 @@
-import { useState, useEffect, useRef } from 'react'
+import { useState } from 'react'
+import { useNavigate } from 'react-router-dom'
 import logoSidebar from '@/assets/logo_sidebar.png'
 import { useMapStore, Place } from '@/stores/mapStore'
 import { useAuthStore } from '@/stores/authStore'
 import { useTripStore } from '@/stores/tripStore'
 import { deletePlace as deletePlaceService } from '@/services/firestore'
 import { cn } from '@/lib/utils'
-import { ChevronRight, ChevronLeft, MapPin, Calendar, Image as ImageIcon, Trash2, LogOut, GripVertical } from 'lucide-react'
+import { ChevronRight, ChevronLeft, ChevronDown, MapPin, Calendar, Image as ImageIcon, Trash2, LogOut } from 'lucide-react'
 import { toast } from 'sonner'
 
 export const Sidebar = () => {
     const {
-        places,
+        allPlaces,
         selectedPlace,
         setSelectedPlace,
-        deletePlace,
         isSidebarOpen,
         toggleSidebar,
         setMapCenter
     } = useMapStore()
 
     const { currentUser, logout } = useAuthStore()
-    const { currentTrip } = useTripStore()
+    const { trips, currentTrip, setCurrentTrip } = useTripStore()
+    const navigate = useNavigate()
 
-    const [orderedPlaces, setOrderedPlaces] = useState<Place[]>(places)
-    const dragIndex = useRef<number | null>(null)
-    const [draggingIndex, setDraggingIndex] = useState<number | null>(null)
-
-    useEffect(() => {
-        setOrderedPlaces(places)
-    }, [places])
+    // Track which trips are expanded in the nested view
+    const [expandedTrips, setExpandedTrips] = useState<Set<string>>(new Set(trips.map(t => t.id!)))
+    const [tripsExpanded, setTripsExpanded] = useState(true)
+    const [dotsExpanded, setDotsExpanded] = useState(true)
 
     const handlePlaceClick = (place: Place) => {
         setSelectedPlace(place)
         setMapCenter(place.location)
     }
 
-    const handleDelete = async (e: React.MouseEvent, id: string) => {
+    const handleDelete = async (e: React.MouseEvent, place: Place) => {
         e.stopPropagation()
-        if (!currentUser || !currentTrip?.id) return
+        if (!currentUser) return
+        const tripId = place.tripId || currentTrip?.id
+        if (!tripId) return
         if (confirm('確定要刪除這個地點嗎？')) {
             try {
-                await deletePlaceService(currentUser.uid, currentTrip.id, id)
-                deletePlace(id)
+                await deletePlaceService(currentUser.uid, tripId, place.id)
                 toast.success('地點已刪除')
             } catch (error) {
                 console.error(error)
@@ -50,33 +49,79 @@ export const Sidebar = () => {
         }
     }
 
-    const handleDragStart = (index: number) => {
-        dragIndex.current = index
-        setDraggingIndex(index)
+    const toggleTripExpanded = (tripId: string) => {
+        setExpandedTrips(prev => {
+            const next = new Set(prev)
+            if (next.has(tripId)) {
+                next.delete(tripId)
+            } else {
+                next.add(tripId)
+            }
+            return next
+        })
     }
 
-    const handleDragOver = (e: React.DragEvent) => {
-        e.preventDefault()
-    }
+    // Dot card component (shared between nested + flat views)
+    const DotCard = ({ place }: { place: Place }) => (
+        <div
+            key={place.id}
+            onClick={() => handlePlaceClick(place)}
+            className={cn(
+                "group relative p-2.5 rounded-xl border transition-all duration-200 cursor-pointer hover:shadow-md flex gap-2.5 items-start",
+                selectedPlace?.id === place.id
+                    ? "bg-blue-50 border-blue-200 shadow-sm"
+                    : "bg-white border-gray-100 hover:border-gray-200",
+            )}
+        >
+            {/* Thumbnail */}
+            <div className="w-12 h-12 rounded-lg bg-gray-100 overflow-hidden flex-shrink-0">
+                {(place.photo_refs && place.photo_refs.length > 0) || (place.photos && place.photos.length > 0) ? (
+                    <img
+                        src={
+                            place.photo_refs && place.photo_refs.length > 0
+                                ? `https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photoreference=${place.photo_refs[0]}&key=${import.meta.env.VITE_GOOGLE_MAPS_API_KEY}`
+                                : place.photos![0]
+                        }
+                        alt={place.name}
+                        className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+                    />
+                ) : (
+                    <div className="w-full h-full flex items-center justify-center text-gray-300">
+                        <ImageIcon size={16} />
+                    </div>
+                )}
+            </div>
 
-    const handleDrop = (targetIndex: number) => {
-        if (dragIndex.current === null || dragIndex.current === targetIndex) {
-            setDraggingIndex(null)
-            dragIndex.current = null
-            return
-        }
-        const updated = [...orderedPlaces]
-        const [moved] = updated.splice(dragIndex.current, 1)
-        updated.splice(targetIndex, 0, moved)
-        setOrderedPlaces(updated)
-        dragIndex.current = null
-        setDraggingIndex(null)
-    }
-
-    const handleDragEnd = () => {
-        dragIndex.current = null
-        setDraggingIndex(null)
-    }
+            {/* Content */}
+            <div className="flex-1 min-w-0">
+                <div className="flex justify-between items-start">
+                    <h3 className={cn(
+                        "font-semibold text-xs truncate pr-1 flex-1",
+                        selectedPlace?.id === place.id ? "text-blue-700" : "text-gray-800"
+                    )}>
+                        {place.name}
+                    </h3>
+                    <button
+                        onClick={(e) => handleDelete(e, place)}
+                        className="p-1 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-md transition-all opacity-0 group-hover:opacity-100"
+                        title="Delete place"
+                    >
+                        <Trash2 size={12} />
+                    </button>
+                </div>
+                <p className="text-xs text-gray-400 truncate mt-0.5 flex items-center gap-0.5">
+                    <MapPin size={9} />
+                    {place.address || "No address"}
+                </p>
+                {place.visitedDate && (
+                    <p className="text-xs text-gray-400 mt-0.5 flex items-center gap-0.5">
+                        <Calendar size={9} />
+                        {place.visitedDate}
+                    </p>
+                )}
+            </div>
+        </div>
+    )
 
     return (
         <>
@@ -103,122 +148,165 @@ export const Sidebar = () => {
 
                     <div className="flex items-center justify-between">
                         <div className="flex items-center gap-3 min-w-0">
-                            <div className="w-9 h-9 rounded-full bg-blue-100 flex items-center justify-center text-blue-600 font-bold shrink-0">
-                                {currentUser?.email?.[0].toUpperCase() || 'U'}
-                            </div>
+                            {/* 點擊頭像 → 個人中心 */}
+                            <button
+                                onClick={() => navigate('/profile')}
+                                className="w-9 h-9 rounded-full overflow-hidden bg-blue-100 flex items-center justify-center text-blue-600 font-bold shrink-0 hover:bg-blue-200 transition-colors"
+                                title="個人中心"
+                            >
+                                {currentUser?.photoURL ? (
+                                    <img src={currentUser.photoURL} alt="avatar" className="w-full h-full object-cover" />
+                                ) : (
+                                    (currentUser?.displayName || currentUser?.email || 'U')[0].toUpperCase()
+                                )}
+                            </button>
                             <div className="min-w-0">
-                                <p className="text-sm font-semibold text-gray-900 truncate">{currentUser?.email}</p>
-                                <button
-                                    onClick={() => logout()}
-                                    className="text-xs text-gray-500 hover:text-red-600 flex items-center gap-1 transition-colors"
-                                >
-                                    <LogOut size={12} />
-                                    Sign out
-                                </button>
+                                <p className="text-sm font-semibold text-gray-900 truncate">
+                                    {currentUser?.displayName || currentUser?.email}
+                                </p>
                             </div>
                         </div>
-                        {/* Mobile Toggle Button */}
-                        <button
-                            onClick={toggleSidebar}
-                            className="md:hidden p-2 bg-gray-100 hover:bg-gray-200 text-gray-600 rounded-full transition-colors"
-                        >
-                            {isSidebarOpen ? <ChevronRight className="rotate-90" size={20} /> : null}
-                        </button>
+                        <div className="flex items-center gap-1">
+                            {/* Mobile Toggle Button */}
+                            <button
+                                onClick={toggleSidebar}
+                                className="md:hidden p-2 bg-gray-100 hover:bg-gray-200 text-gray-600 rounded-full transition-colors"
+                            >
+                                {isSidebarOpen ? <ChevronRight className="rotate-90" size={20} /> : null}
+                            </button>
+                        </div>
                     </div>
                 </div>
 
-                {/* Title */}
-                <div className="px-4 pt-4 pb-2">
-                    <h2 className="text-xl font-bold text-gray-800">儲存地點</h2>
-                    <p className="text-sm text-gray-500">{places.length} places</p>
-                </div>
+                {/* Trips + Dots Sections */}
+                <div className="flex-1 overflow-y-auto">
 
-                {/* List */}
-                <div className="flex-1 overflow-y-auto p-4 space-y-3">
-                    {orderedPlaces.map((place, index) => (
-                        <div
-                            key={place.id}
-                            draggable={true}
-                            onDragStart={() => handleDragStart(index)}
-                            onDragOver={handleDragOver}
-                            onDrop={() => handleDrop(index)}
-                            onDragEnd={handleDragEnd}
-                            onClick={() => handlePlaceClick(place)}
-                            className={cn(
-                                "group relative p-3 rounded-xl border transition-all duration-200 cursor-pointer hover:shadow-md flex gap-3 items-start",
-                                selectedPlace?.id === place.id
-                                    ? "bg-blue-50 border-blue-200 shadow-sm"
-                                    : "bg-white border-gray-100 hover:border-gray-200",
-                                draggingIndex === index && "opacity-50"
-                            )}
+                    {/* ── Trips（巢狀：每個 trip 下顯示其 dots）── */}
+                    <div className="px-3 pt-3">
+                        <button
+                            onClick={() => setTripsExpanded(e => !e)}
+                            className="w-full flex items-center justify-between px-2 py-1.5 rounded-lg hover:bg-gray-100 transition-colors text-left"
                         >
-                            {/* Drag Handle */}
-                            <div
-                                className="flex-shrink-0 flex items-center self-center text-gray-300 hover:text-gray-500 cursor-grab active:cursor-grabbing"
-                                onMouseDown={(e) => e.stopPropagation()}
-                            >
-                                <GripVertical size={16} />
-                            </div>
+                            <span className="text-xs font-semibold text-gray-500 uppercase tracking-wider">Trips</span>
+                            <ChevronDown
+                                size={14}
+                                className={cn("text-gray-400 transition-transform duration-200", tripsExpanded ? "" : "-rotate-90")}
+                            />
+                        </button>
 
-                            {/* Thumbnail */}
-                            <div className="w-16 h-16 rounded-lg bg-gray-100 overflow-hidden flex-shrink-0">
-                                {(place.photo_refs && place.photo_refs.length > 0) || (place.photos && place.photos.length > 0) ? (
-                                    <img
-                                        src={
-                                            place.photo_refs && place.photo_refs.length > 0
-                                                ? `https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photoreference=${place.photo_refs[0]}&key=${import.meta.env.VITE_GOOGLE_MAPS_API_KEY}`
-                                                : place.photos![0]
-                                        }
-                                        alt={place.name}
-                                        className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
-                                    />
-                                ) : (
-                                    <div className="w-full h-full flex items-center justify-center text-gray-300">
-                                        <ImageIcon size={20} />
-                                    </div>
+                        {tripsExpanded && (
+                            <div className="mt-1 space-y-1">
+                                {trips.length === 0 && (
+                                    <p className="px-3 py-2 text-xs text-gray-400">尚無旅程</p>
+                                )}
+                                {trips.map(trip => {
+                                    const tripPlaces = allPlaces.filter(p => p.tripId === trip.id)
+                                    const isActive = currentTrip?.id === trip.id
+                                    const isOpen = expandedTrips.has(trip.id!)
+
+                                    return (
+                                        <div key={trip.id}>
+                                            {/* Trip row */}
+                                            <div className={cn(
+                                                "flex items-center rounded-lg transition-all",
+                                                isActive ? "bg-blue-50" : "hover:bg-gray-50"
+                                            )}>
+                                                {/* Chevron toggle */}
+                                                <button
+                                                    onClick={() => toggleTripExpanded(trip.id!)}
+                                                    className="p-1.5 text-gray-400 hover:text-gray-600 flex-shrink-0"
+                                                >
+                                                    <ChevronDown
+                                                        size={13}
+                                                        className={cn("transition-transform duration-200", isOpen ? "" : "-rotate-90")}
+                                                    />
+                                                </button>
+                                                {/* Trip name (click to set current) */}
+                                                <button
+                                                    onClick={() => setCurrentTrip(trip)}
+                                                    className={cn(
+                                                        "flex-1 text-left px-1 py-2 text-sm min-w-0",
+                                                        isActive
+                                                            ? "border-l-2 border-blue-500 text-blue-700 font-semibold pl-2"
+                                                            : "border-l-2 border-transparent text-gray-700 pl-2"
+                                                    )}
+                                                >
+                                                    <p className="font-medium truncate">{trip.title}</p>
+                                                    {(trip.startDate || trip.endDate) && (
+                                                        <p className="text-xs text-gray-400 mt-0.5">
+                                                            {trip.startDate ? new Date(trip.startDate).toLocaleDateString('zh-TW', { month: 'short', day: 'numeric' }) : ''}
+                                                            {trip.startDate && trip.endDate ? ' – ' : ''}
+                                                            {trip.endDate ? new Date(trip.endDate).toLocaleDateString('zh-TW', { month: 'short', day: 'numeric' }) : ''}
+                                                        </p>
+                                                    )}
+                                                </button>
+                                                {/* Dot count badge */}
+                                                {tripPlaces.length > 0 && (
+                                                    <span className="mr-2 text-xs text-gray-400 flex-shrink-0">{tripPlaces.length}</span>
+                                                )}
+                                            </div>
+
+                                            {/* Nested dots */}
+                                            {isOpen && tripPlaces.length > 0 && (
+                                                <div className="ml-6 mt-0.5 mb-1 space-y-1">
+                                                    {tripPlaces.map(place => (
+                                                        <DotCard key={place.id} place={place} />
+                                                    ))}
+                                                </div>
+                                            )}
+                                            {isOpen && tripPlaces.length === 0 && (
+                                                <p className="ml-6 px-2 py-1 text-xs text-gray-400">尚無地點</p>
+                                            )}
+                                        </div>
+                                    )
+                                })}
+                            </div>
+                        )}
+                    </div>
+
+                    {/* Divider */}
+                    <div className="my-2 mx-3 border-t border-gray-100" />
+
+                    {/* ── Dots（所有旅程的全部地點）── */}
+                    <div className="px-3 pb-3">
+                        <button
+                            onClick={() => setDotsExpanded(e => !e)}
+                            className="w-full flex items-center justify-between px-2 py-1.5 rounded-lg hover:bg-gray-100 transition-colors text-left"
+                        >
+                            <span className="text-xs font-semibold text-gray-500 uppercase tracking-wider">
+                                Dots{allPlaces.length > 0 ? ` (${allPlaces.length})` : ''}
+                            </span>
+                            <ChevronDown
+                                size={14}
+                                className={cn("text-gray-400 transition-transform duration-200", dotsExpanded ? "" : "-rotate-90")}
+                            />
+                        </button>
+                        {dotsExpanded && (
+                            <div className="mt-1 space-y-1">
+                                {allPlaces.map(place => (
+                                    <DotCard key={place.id} place={place} />
+                                ))}
+                                {allPlaces.length === 0 && (
+                                    <p className="px-3 py-2 text-xs text-gray-400">尚無地點</p>
                                 )}
                             </div>
-
-                            {/* Content */}
-                            <div className="flex-1 min-w-0 group/item">
-                                <div className="flex justify-between items-start">
-                                    <h3 className={cn(
-                                        "font-semibold text-sm truncate pr-2 flex-1",
-                                        selectedPlace?.id === place.id ? "text-blue-700" : "text-gray-800"
-                                    )}>
-                                        {place.name}
-                                    </h3>
-                                    {/* Delete Button (Visible on Hover) */}
-                                    <button
-                                        onClick={(e) => handleDelete(e, place.id)}
-                                        className="p-1.5 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-md transition-all opacity-0 group-hover:opacity-100 md:opacity-0 md:group-hover:opacity-100"
-                                        title="Delete place"
-                                    >
-                                        <Trash2 size={14} />
-                                    </button>
-                                </div>
-
-                                {/* Tags or Address */}
-                                <p className="text-xs text-gray-500 truncate mt-1 flex items-center gap-1">
-                                    <MapPin size={10} />
-                                    {place.address || "No address"}
-                                </p>
-
-                                {/* Date */}
-                                {place.visitedDate && (
-                                    <p className="text-xs text-gray-400 mt-1 flex items-center gap-1">
-                                        <Calendar size={10} />
-                                        {place.visitedDate}
-                                    </p>
-                                )}
-                            </div>
-                        </div>
-                    ))}
+                        )}
+                    </div>
                 </div>
 
+                {/* Log Out - 固定底部 */}
+                <div className="shrink-0 border-t border-gray-100 p-3">
+                    <button
+                        onClick={async () => { await logout(); navigate('/login') }}
+                        className="w-full flex items-center gap-2 px-3 py-2 text-sm text-gray-500 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                    >
+                        <LogOut size={15} />
+                        Log Out
+                    </button>
+                </div>
             </div>
 
-            {/* Desktop Collapse Button - Positioned at the right edge of the left sidebar */}
+            {/* Desktop Collapse Button */}
             {isSidebarOpen && (
                 <button
                     onClick={toggleSidebar}

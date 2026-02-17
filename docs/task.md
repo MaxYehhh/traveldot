@@ -59,10 +59,36 @@
     - [x] **3.4 Phase 3 自我審查與驗收**
 
 - [ ] **Phase 4: 旅程管理與列表模式** <!-- Week 5-6 -->
-    - [ ] 實作 Landing Page 旅程列表 (AC-009 ~ AC-019)
+    - [ ] 實作旅程管理功能（旅程列表、建立、編輯、刪除）(AC-009 ~ AC-019)（功能位於 /profile 個人中心）
     - [ ] 實作地點列表模式 (Timeline) (AC-048 ~ AC-050)
     - [ ] 實作篩選功能 (Tags, Date) (AC-046 ~ AC-047)
 
-- [ ] **Phase 5: 資料匯出與分享** <!-- Week 7-8 -->
-    - [ ] 實作資料匯出 (ZIP) (AC-055 ~ AC-056)
+- [ ] **Phase 5: React Router 路由重構**
+    - [ ] 安裝 react-router-dom，配置 BrowserRouter
+    - [ ] 建立 `ProtectedRoute` 元件（未登入跳轉 /login + 記錄 returnUrl）（AC-091）
+    - [ ] 建立 `PublicOnlyRoute` 元件（已登入跳轉 /map）（AC-093）
+    - [ ] 實作登入成功後跳轉 returnUrl 邏輯（AC-092）
+    - [ ] 將 App.tsx 從 Zustand 狀態控制（authStore.isInitialized）改為路由控制
+    - [ ] 設定根路徑 / → /home 重定向
+    - [ ] 建立 `src/pages/` 各頁面元件骨架（HomePage, LoginPage, RegisterPage, MapPage, ProfilePage）
+    - [ ] 將現有認證相關 UI 遷移至 LoginPage 與 RegisterPage
+    - [ ] 將現有地圖主頁 UI 遷移至 MapPage
+
+- [ ] **Phase 6: Home Page 官方首頁**
+    - [ ] 實作 /home 行銷頁 Nav（Logo 左、登入/註冊按鈕右，已登入顯示「前往地圖」按鈕）（AC-069）
+    - [ ] 實作 Hero Section（大標題「Every Dot Tells a Story」+ 副標 + 「立即開始」CTA 按鈕）（AC-068）
+    - [ ] 實作 CTA 點擊跳轉 /register（AC-070）
+    - [ ] 實作 Feature Section（3 個功能亮點卡片：地圖記錄、照片串聯、旅程整理）
+    - [ ] 實作 Footer（版權文字）
+
+- [ ] **Phase 7: Profile Page 個人中心**
+    - [ ] 建立 /profile 頁面基礎佈局（Header 含返回地圖按鈕）（AC-081）
+    - [ ] 實作 User Info Card（顯示 Email + 加入日期）（AC-081）
+    - [ ] 將旅程列表從舊 Landing Page 遷移至 Profile 的「我的旅程」區塊（AC-082）
+    - [ ] 實作旅程卡片點擊 → 跳轉 /map 並選取旅程（AC-085）
+    - [ ] 實作登出按鈕（清除狀態並跳轉 /home）（AC-083）
+    - [ ] 實作資料匯出入口（串接 AC-066 匯出流程）（AC-084）
+
+- [ ] **Phase 8: 資料匯出與分享** <!-- Week 7-8 -->
+    - [ ] 實作資料匯出 (ZIP) (AC-066 ~ AC-067)
     - [ ] (Future) 實作分享頁面

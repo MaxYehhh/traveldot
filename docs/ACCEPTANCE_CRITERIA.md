@@ -23,7 +23,7 @@ When: 輸入 Email: "test@example.com"
   And: 點擊「Sign up」按鈕
 Then: 帳號建立成功
   And: 自動登入
-  And: 跳轉到 Landing Page
+  And: 跳轉到 /map（或原本的 returnUrl，若有）
   And: 顯示 Toast: "歡迎加入 TravelDot!"
 ```
 
@@ -69,7 +69,7 @@ Given: 使用者已註冊帳號 (test@example.com / Test1234!)
 When: 輸入正確的 Email 和 Password
   And: 點擊「Login」按鈕
 Then: 登入成功
-  And: 跳轉到 Landing Page
+  And: 跳轉到 /map（或原本的 returnUrl，若有）
   And: Header 顯示使用者名稱
 ```
 
@@ -114,7 +114,7 @@ Then: 顯示成功訊息: "重設連結已發送到您的信箱"
 
 ---
 
-## 2. Landing Page (旅程列表)
+## 2. 旅程管理
 
 ### 2.1 顯示旅程列表
 
@@ -122,7 +122,7 @@ Then: 顯示成功訊息: "重設連結已發送到您的信箱"
 > Status: ⏳ 尚未驗收
 ```
 Given: 新註冊的使用者登入
-When: 進入 Landing Page
+When: 進入旅程管理頁面（/profile）
 Then: 顯示標題「My Trips」
   And: 顯示空狀態提示: "還沒有旅程,點擊右上角 + 按鈕開始記錄吧!"
   And: 顯示 [+ New Trip] 按鈕
@@ -132,7 +132,7 @@ Then: 顯示標題「My Trips」
 > Status: ⏳ 尚未驗收
 ```
 Given: 使用者有 3 個旅程
-When: 進入 Landing Page
+When: 進入旅程管理頁面（/profile）
 Then: 顯示 3 張 Trip Card
   And: 每張卡片顯示:
     - 封面圖 (如果有)
@@ -145,7 +145,7 @@ Then: 顯示 3 張 Trip Card
 **AC-011: Trip Card Hover 效果**
 > Status: ⏳ 尚未驗收
 ```
-Given: 使用者在 Landing Page (桌面版)
+Given: 使用者在旅程管理頁面（/profile，桌面版）
 When: 滑鼠移到 Trip Card 上
 Then: 卡片陰影加深 (shadow-md → shadow-lg)
   And: 卡片向上移動 4px (translateY(-4px))
@@ -158,7 +158,7 @@ Then: 卡片陰影加深 (shadow-md → shadow-lg)
 **AC-012: 開啟建立旅程 Modal**
 > Status: ⏳ 尚未驗收
 ```
-Given: 使用者在 Landing Page
+Given: 使用者在旅程管理頁面（/profile）
 When: 點擊 [+ New Trip] 按鈕
 Then: 彈出「建立旅程」Modal
   And: Modal 包含:
@@ -216,7 +216,7 @@ Then: 顯示錯誤訊息: "結束日期不能早於開始日期"
 **AC-016: 開啟編輯 Modal**
 > Status: ⏳ 尚未驗收
 ```
-Given: 使用者在 Landing Page
+Given: 使用者在旅程管理頁面（/profile）
   And: 有一個旅程「泰國之旅」
 When: 右鍵點擊 Trip Card (或長按在手機上)
 Then: 顯示選單:
@@ -247,7 +247,7 @@ Then: Modal 關閉
 **AC-018: 刪除確認對話框**
 > Status: ⏳ 尚未驗收
 ```
-Given: 使用者在 Landing Page
+Given: 使用者在旅程管理頁面（/profile）
 When: 右鍵點擊 Trip Card
   And: 選擇「刪除」
 Then: 彈出確認對話框:
@@ -277,11 +277,11 @@ Then: 對話框關閉
 **AC-020: 進入旅程地圖**
 > Status: ✅ 完成
 ```
-Given: 使用者在 Landing Page
+Given: 使用者在 Profile 頁面（/profile）
   And: 有一個旅程「泰國之旅」(包含 5 個地點)
-When: 點擊該 Trip Card
-Then: 跳轉到地圖頁面
-  And: URL 變成: /trips/{tripId}/map
+When: 點擊該旅程卡片
+Then: 跳轉到地圖頁面 /map
+  And: Store 中自動選取「泰國之旅」（旅程選擇透過 tripStore 狀態管理，不在 URL 中）
   And: Header 顯示旅程名稱: "泰國之旅"
   And: 地圖載入完成 (< 2 秒)
   And: 地圖中心自動移到所有地點的中心位置
@@ -823,7 +823,7 @@ Then: 顯示唯讀的地點頁面
 **AC-053: 產生旅程分享連結**
 > Status: ⏳ 尚未驗收
 ```
-Given: 使用者在 Landing Page
+Given: 使用者在旅程管理頁面（/profile）
 When: 右鍵點擊 Trip Card
   And: 選擇「分享」
 Then: 彈出分享 Modal
@@ -896,10 +896,10 @@ Then: 顯示錯誤訊息: "匯出失敗,請檢查網路連線"
 > Status: ⏳ 尚未驗收
 ```
 Given: 使用者登入後
-When: 進入 Landing Page
+When: 進入 /profile（旅程管理頁面）
 Then: First Contentful Paint (FCP) < 1.5 秒
   And: 旅程卡片圖片使用 lazy loading
-  And: 如果圖片尚未載入,顯示灰色 placeholder
+  And: 如果圖片尚未載入，顯示灰色 placeholder
 ```
 
 **AC-058: 地圖載入效能**
@@ -1005,6 +1005,134 @@ When: Focus 到 FAB 按鈕
 Then: 讀出: "新增地點按鈕"
 When: Focus 到地點列表項目
 Then: 讀出: "Cafe Amazon, 2024 年 3 月 5 日下午 2 點 30 分,評分 5 星"
+```
+
+---
+
+---
+
+## 10. 首頁 Home Page
+
+**AC-068: 未登入用戶訪問 /home**
+> Status: ⏳ 尚未驗收
+```
+Given: 未登入用戶
+When: 訪問 /home
+Then: 顯示品牌 Hero Section
+  And: Hero 包含大標題「Every Dot Tells a Story」
+  And: 顯示副標題與說明文字
+  And: 顯示「立即開始」CTA 按鈕
+  And: Nav 右側顯示「登入」與「註冊」按鈕
+  And: 顯示 3 個功能亮點卡片（地圖記錄、照片串聯、旅程整理）
+```
+
+**AC-069: 已登入用戶訪問 /home**
+> Status: ⏳ 尚未驗收
+```
+Given: 已登入用戶
+When: 訪問 /home
+Then: 顯示 Home Page 內容（不強制跳轉）
+  And: Nav 右側顯示「前往地圖」按鈕（取代登入/註冊按鈕）
+  And: 點擊「前往地圖」按鈕跳轉至 /map
+```
+
+**AC-070: 未登入用戶點擊 CTA**
+> Status: ⏳ 尚未驗收
+```
+Given: 未登入用戶在 /home 頁面
+When: 點擊「立即開始」CTA 按鈕
+Then: 跳轉至 /register 頁面
+```
+
+---
+
+## 11. 個人中心 Profile Page
+
+**AC-081: 顯示用戶基本資料**
+> Status: ⏳ 尚未驗收
+```
+Given: 已登入用戶
+When: 訪問 /profile
+Then: 顯示用戶 Email
+  And: 顯示加入日期（格式：已加入 YYYY 年 MM 月）
+  And: Header 顯示返回地圖按鈕與頁面標題「個人中心」
+```
+
+**AC-082: 顯示旅程列表**
+> Status: ⏳ 尚未驗收
+```
+Given: 已登入用戶
+  And: 有 3 個旅程
+When: 查看 /profile 頁面
+Then: 顯示「我的旅程」區塊
+  And: 每個旅程卡片顯示：旅程名稱、地點數量、日期範圍
+  And: 卡片按建立時間倒序排列
+  And: 若無旅程，顯示空狀態提示「還沒有旅程，前往地圖建立你的第一個旅程吧！」
+```
+
+**AC-083: 登出功能**
+> Status: ⏳ 尚未驗收
+```
+Given: 已登入用戶
+When: 點擊登出按鈕
+Then: 清除 Firebase Auth 登入狀態
+  And: 清除 authStore 中的用戶資料
+  And: 跳轉至 /home
+  And: 顯示 Toast: "已成功登出"
+```
+
+**AC-084: 資料匯出入口**
+> Status: ⏳ 尚未驗收
+```
+Given: 已登入用戶
+When: 查看 /profile 頁面
+Then: 顯示「資料管理」區塊
+  And: 顯示「匯出資料」按鈕
+  And: 點擊後觸發匯出流程（詳見 AC-066）
+```
+
+**AC-085: 從 Profile 切換旅程**
+> Status: ⏳ 尚未驗收
+```
+Given: 已登入用戶
+  And: 在 /profile 頁面查看旅程列表
+When: 點擊旅程卡片
+Then: 跳轉至 /map
+  And: tripStore 自動選取該旅程
+  And: 地圖顯示該旅程的所有地點
+```
+
+---
+
+## 12. 路由守衛 Route Guard
+
+**AC-091: 未登入訪問受保護頁面**
+> Status: ⏳ 尚未驗收
+```
+Given: 未登入用戶
+When: 訪問 /map 或 /profile
+Then: 跳轉至 /login
+  And: URL 附帶 returnUrl 參數（例：/login?returnUrl=/map）
+  And: 不顯示任何受保護的內容
+```
+
+**AC-092: 登入後跳回原頁面**
+> Status: ⏳ 尚未驗收
+```
+Given: 未登入用戶被路由守衛跳轉至 /login
+  And: URL 包含 returnUrl=/map
+When: 成功登入
+Then: 跳轉至 returnUrl 指定的頁面（/map）
+  And: 而非預設的 /map（兩者在此案例相同，但 returnUrl 優先）
+```
+
+**AC-093: 已登入用戶訪問公開頁面**
+> Status: ⏳ 尚未驗收
+```
+Given: 已登入用戶
+When: 直接訪問 /login 或 /register
+Then: 自動跳轉至 /map
+  And: 不顯示登入或註冊表單
 ```
 
 ---

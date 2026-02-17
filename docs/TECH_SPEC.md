@@ -107,11 +107,101 @@ src/
 │   ├── user.ts
 │   └── api.ts
 └── pages/               # Page Components
-    ├── LandingPage.tsx
-    ├── MapPage.tsx
-    ├── LoginPage.tsx
-    └── SettingsPage.tsx
+    ├── HomePage.tsx      # 官方行銷首頁 (/home, 公開)
+    ├── LoginPage.tsx     # 登入頁 (/login, 公開)
+    ├── RegisterPage.tsx  # 註冊頁 (/register, 公開)
+    ├── MapPage.tsx       # 地圖主頁 (/map, 需登入)
+    └── ProfilePage.tsx   # 個人中心 (/profile, 需登入)
 ```
+
+---
+
+### 1.3 Page Routing Architecture 頁面路由架構
+
+#### URL 結構
+
+| 路徑 | 說明 | 存取控制 |
+|------|------|---------|
+| `/home` | 官方行銷首頁（Hero + CTA + Feature） | 公開 |
+| `/login` | 登入頁 | 公開（已登入自動跳轉 /map） |
+| `/register` | 註冊頁 | 公開（已登入自動跳轉 /map） |
+| `/map` | 地圖主頁，核心功能 | 需登入 |
+| `/profile` | 個人中心（旅程列表、匯出、登出） | 需登入 |
+
+#### 路由守衛規則（ProtectedRoute）
+
+```
+未登入用戶 → 訪問 /map 或 /profile
+  → 記錄 returnUrl（?returnUrl=/map）
+  → 跳轉 /login
+
+已登入用戶 → 訪問 /login 或 /register
+  → 跳轉 /map
+
+登入成功後
+  → 若有 returnUrl → 跳轉 returnUrl
+  → 否則 → 跳轉 /map
+```
+
+#### 重定向邏輯
+
+```
+/ → /home（根路徑重定向至行銷首頁）
+/home（已登入）→ 保留在 /home（顯示「前往地圖」捷徑，不強制跳轉）
+```
+
+#### ProtectedRoute 元件介面
+
+```typescript
+interface ProtectedRouteProps {
+  children: React.ReactNode;
+  redirectTo?: string;  // 預設 '/login'
+}
+
+// 用法
+<ProtectedRoute>
+  <MapPage />
+</ProtectedRoute>
+```
+
+#### PublicOnlyRoute 元件介面（登入後重定向）
+
+```typescript
+interface PublicOnlyRouteProps {
+  children: React.ReactNode;
+  redirectTo?: string;  // 預設 '/map'
+}
+
+// 用法（用於 /login, /register）
+<PublicOnlyRoute>
+  <LoginPage />
+</PublicOnlyRoute>
+```
+
+---
+
+### 1.4 State Management Stores 狀態管理
+
+（原 1.3 內容，此節僅為說明現有三個 Zustand Store 架構，詳見 CLAUDE.md）
+
+---
+
+### 1.5 Terminology 術語定義
+
+跨層術語對照表，確保各角色（產品、設計、開發）溝通一致：
+
+| 程式碼層（不變） | UI 介面層（中文） | 概念／行銷層（英文） | 說明 |
+|----------------|----------------|-------------------|------|
+| `place` | 地點 | Dot | 一個地理位置記錄，含名稱、座標、照片、心得 |
+| `trip` | 旅程 | Trip | Dot 的分類容器，非必要，Dot 可獨立存在 |
+| `user` | 使用者 | — | 帳號擁有者 |
+| `media` | 照片 | — | 上傳到地點的圖片檔案 |
+
+**層級關係**：User → Trips（分類容器，選用）→ Dots（核心資料單位）
+
+- Dot 是 TravelDot 的核心資料單位，可獨立存在，不一定屬於任何 Trip
+- Trip 是 Dot 的分類工具，幫助使用者整理多個相關 Dot
+- 程式碼中變數名稱（`place`, `trip`）維持不變，僅 UI 層使用中文
 
 ---
 
@@ -700,16 +790,48 @@ function initAutocomplete(
 #### Code Splitting 程式碼分割
 ```typescript
 // Lazy load pages
-const LandingPage = lazy(() => import('./pages/LandingPage'));
+const HomePage = lazy(() => import('./pages/HomePage'));
+const LoginPage = lazy(() => import('./pages/LoginPage'));
+const RegisterPage = lazy(() => import('./pages/RegisterPage'));
 const MapPage = lazy(() => import('./pages/MapPage'));
-const SettingsPage = lazy(() => import('./pages/SettingsPage'));
+const ProfilePage = lazy(() => import('./pages/ProfilePage'));
 
-// Route-based code splitting
-<Routes>
-  <Route path="/" element={<Suspense fallback={<Loading />}><LandingPage /></Suspense>} />
-  <Route path="/trips/:tripId" element={<Suspense fallback={<Loading />}><MapPage /></Suspense>} />
-  <Route path="/settings" element={<Suspense fallback={<Loading />}><SettingsPage /></Suspense>} />
-</Routes>
+// Route-based code splitting with BrowserRouter + ProtectedRoute
+<BrowserRouter>
+  <Routes>
+    {/* 根路徑重定向至 /home */}
+    <Route path="/" element={<Navigate to="/home" replace />} />
+
+    {/* 公開頁面 */}
+    <Route path="/home" element={
+      <Suspense fallback={<Loading />}><HomePage /></Suspense>
+    } />
+
+    {/* 公開頁面（已登入自動跳轉 /map） */}
+    <Route path="/login" element={
+      <PublicOnlyRoute>
+        <Suspense fallback={<Loading />}><LoginPage /></Suspense>
+      </PublicOnlyRoute>
+    } />
+    <Route path="/register" element={
+      <PublicOnlyRoute>
+        <Suspense fallback={<Loading />}><RegisterPage /></Suspense>
+      </PublicOnlyRoute>
+    } />
+
+    {/* 需登入頁面 */}
+    <Route path="/map" element={
+      <ProtectedRoute>
+        <Suspense fallback={<Loading />}><MapPage /></Suspense>
+      </ProtectedRoute>
+    } />
+    <Route path="/profile" element={
+      <ProtectedRoute>
+        <Suspense fallback={<Loading />}><ProfilePage /></Suspense>
+      </ProtectedRoute>
+    } />
+  </Routes>
+</BrowserRouter>
 ```
 
 #### Image Optimization 圖片優化

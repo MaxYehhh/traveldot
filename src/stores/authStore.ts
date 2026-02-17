@@ -1,7 +1,7 @@
 import { create } from 'zustand';
 import { User, onAuthStateChanged } from 'firebase/auth';
 import { auth } from '../services/firebase';
-import { signIn, signUp, signOut, resetPassword } from '../services/auth';
+import { signIn, signUp, signOut, resetPassword, updateUserProfile as updateUserProfileService } from '../services/auth';
 
 interface AuthState {
     currentUser: User | null;
@@ -15,6 +15,7 @@ interface AuthActions {
     signup: (email: string, password: string) => Promise<void>;
     logout: () => Promise<void>;
     resetPassword: (email: string) => Promise<void>;
+    updateUserProfile: (updates: { displayName?: string; photoURL?: string }) => Promise<void>;
     setCurrentUser: (user: User | null) => void;
     clearError: () => void;
 }
@@ -66,6 +67,21 @@ export const useAuthStore = create<AuthState & AuthActions>((set) => ({
         set({ loading: true, error: null });
         try {
             await resetPassword(email);
+        } catch (error: any) {
+            set({ error: error.message });
+            throw error;
+        } finally {
+            set({ loading: false });
+        }
+    },
+
+    updateUserProfile: async (updates) => {
+        const user = useAuthStore.getState().currentUser;
+        if (!user) return;
+        set({ loading: true, error: null });
+        try {
+            await updateUserProfileService(user, updates);
+            // onAuthStateChanged will auto-sync currentUser
         } catch (error: any) {
             set({ error: error.message });
             throw error;

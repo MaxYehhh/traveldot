@@ -19,8 +19,10 @@ export const PlaceSearch = ({ onClose }: PlaceSearchProps) => {
     const [activeIndex, setActiveIndex] = useState(-1)
     const [isLoading, setIsLoading] = useState(false)
 
-    const { setSelectedPlace, setMapState } = useMapStore()
+    const { setSelectedPlace, setMapState, isEditorOpen, editorLayoutMode, editorPanelWidth } = useMapStore()
     const inputRef = useRef<HTMLInputElement>(null)
+
+    const editorOffset = isEditorOpen && editorLayoutMode === 'panel' ? editorPanelWidth / 2 : 0
 
     useEffect(() => {
         if (!placesLib || !map) return
@@ -132,7 +134,13 @@ export const PlaceSearch = ({ onClose }: PlaceSearchProps) => {
     }
 
     return (
-        <div className="absolute top-4 left-1/2 -translate-x-1/2 z-10 w-full max-w-sm animate-in fade-in slide-in-from-top-4 duration-300">
+        <div
+            className="absolute top-4 z-10 w-full max-w-sm animate-in fade-in slide-in-from-top-4 duration-300"
+            style={{
+                left: '50%',
+                transform: `translateX(calc(-50% - ${editorOffset}px))`
+            }}
+        >
             <div className="flex flex-col gap-2">
                 <div className="relative flex items-center gap-2">
                     <div className="relative flex-1 group">

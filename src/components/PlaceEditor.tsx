@@ -4,7 +4,7 @@ import { useAuthStore } from '@/stores/authStore'
 import { createPlace, updatePlace, deletePlace as deletePlaceService } from '@/services/firestore'
 import { uploadPhoto } from '@/services/storage'
 import { toast } from 'sonner'
-import { X, Save, Trash2, Check, Calendar, Tag, Image as ImageIcon, Plus, PanelRight, Maximize2 } from 'lucide-react'
+import { X, Save, Trash2, Check, Calendar, Tag, Image as ImageIcon, Plus, PanelRight, Maximize2, Map as MapIcon } from 'lucide-react'
 import { useEffect, useState, useRef, useCallback } from 'react'
 import { RichTextEditor } from './editor/RichTextEditor'
 import { DraggablePhotoGrid } from './editor/DraggablePhotoGrid'
@@ -23,8 +23,10 @@ export const PlaceEditor = () => {
         setEditorLayoutMode,
     } = useMapStore()
 
-    const { currentTrip } = useTripStore()
+    const { currentTrip, trips } = useTripStore()
     const { currentUser } = useAuthStore()
+
+    const [selectedTripId, setSelectedTripId] = useState<string>(currentTrip?.id ?? '')
 
     const [name, setName] = useState('')
     const [content, setContent] = useState('')
@@ -69,6 +71,7 @@ export const PlaceEditor = () => {
             const delta = startX.current - e.clientX
             const newWidth = Math.min(800, Math.max(360, startWidth.current + delta))
             setPanelWidth(newWidth)
+            useMapStore.getState().setEditorPanelWidth(newWidth)
         }
 
         const handleMouseUp = () => {
@@ -102,6 +105,7 @@ export const PlaceEditor = () => {
             setTags(selectedPlace.tags || [])
             setVisitedDate(selectedPlace.visitedDate || new Date().toISOString().split('T')[0])
             setColor(selectedPlace.color || DEFAULT_PLACE_COLOR)
+            setSelectedTripId(currentTrip?.id ?? '')
             setErrors({})
         } else if (isEditorOpen && editorMode === 'add') {
             editingPlaceIdRef.current = null
@@ -115,10 +119,17 @@ export const PlaceEditor = () => {
             setTags([])
             setVisitedDate(new Date().toISOString().split('T')[0])
             setColor(DEFAULT_PLACE_COLOR)
+            setSelectedTripId(currentTrip?.id ?? '')
             setErrors({})
             setIsSubmitting(false)
         }
     }, [isEditorOpen, editorMode, selectedPlace])
+
+    useEffect(() => {
+        if (isEditorOpen && editorLayoutMode === 'panel') {
+            useMapStore.getState().setEditorPanelWidth(panelWidth)
+        }
+    }, [isEditorOpen, editorLayoutMode, panelWidth])
 
     if (!isEditorOpen) return null
 
@@ -163,7 +174,7 @@ export const PlaceEditor = () => {
         setIsSubmitting(true)
 
         // Type assertion after null check
-        const tripId = currentTrip.id;
+        const tripId = selectedTripId || currentTrip.id;
 
         try {
             // 1. Upload new photos (AC-062: Individual error handling)
@@ -450,6 +461,23 @@ export const PlaceEditor = () => {
                                 value={visitedDate}
                                 onChange={(e) => setVisitedDate(e.target.value)}
                             />
+                        </div>
+
+                        {/* Trip */}
+                        <div className="flex items-center py-2.5 rounded-xl -mx-2 px-2 hover:bg-gray-50 transition-colors group">
+                            <div className="flex items-center gap-2.5 w-32 shrink-0">
+                                <MapIcon size={15} className="text-gray-400" />
+                                <span className="text-sm text-gray-500">旅程</span>
+                            </div>
+                            <select
+                                className="flex-1 text-sm text-gray-700 bg-transparent border-0 outline-none cursor-pointer"
+                                value={selectedTripId}
+                                onChange={(e) => setSelectedTripId(e.target.value)}
+                            >
+                                {trips.map(trip => (
+                                    <option key={trip.id} value={trip.id}>{trip.title}</option>
+                                ))}
+                            </select>
                         </div>
 
                         {/* Tags */}

@@ -864,7 +864,9 @@ z-index: -1;
 
 ---
 
-### 3.2 Landing Page 旅程列表頁
+### 3.2 旅程管理（Trip List）
+
+> 說明：此視圖為旅程列表（顯示使用者所有旅程卡片），現已整合至 `/profile` 個人中心頁，不再作為獨立的 Landing Page。以下設計規格適用於 Profile 頁中的「我的旅程」區塊。
 
 #### Layout Structure 佈局結構
 ```
@@ -938,6 +940,21 @@ gap: var(--space-6);
   grid-template-columns: 1fr;
 }
 ```
+
+---
+
+---
+
+### 3.2.5 各頁面 Header 設計說明
+
+各頁面的 Header 用途各自不同，不使用統一 Header 元件：
+
+| 頁面 | Header 類型 | 說明 |
+|------|------------|------|
+| `/home` | 行銷 Nav | Logo 左、登入/註冊按鈕右（未登入）；前往地圖按鈕（已登入） |
+| `/login` / `/register` | 簡潔 Header | Logo 居中或左，無主要導覽項目 |
+| `/map` | 地圖工具列 | 旅程名稱、搜尋、Filter、List 切換，無返回按鈕 |
+| `/profile` | 返回按鈕 Header | 左側返回地圖按鈕（`←`），中央頁面標題「個人中心」 |
 
 ---
 
@@ -1189,6 +1206,361 @@ button:active {
 所有可點擊元素的最小尺寸：
 - **手機**：44x44px
 - **桌面**：32x32px
+
+---
+
+### 3.6 Home Page 官方首頁（/home）
+
+#### Layout Structure 佈局結構
+```
+┌─────────────────────────────────────────┐
+│ Nav (64px)  Logo          登入 | 註冊   │
+├─────────────────────────────────────────┤
+│                                         │
+│ Hero Section (min-height: 80vh)         │
+│ 大標題「Every Dot Tells a Story」       │
+│ 副標題                                  │
+│ [立即開始] CTA 按鈕                     │
+│                                         │
+├─────────────────────────────────────────┤
+│ Feature Section (padding: 96px 24px)    │
+│ ┌─────────┐ ┌─────────┐ ┌─────────┐   │
+│ │ 地圖記錄│ │ 照片串聯│ │ 旅程整理│   │
+│ └─────────┘ └─────────┘ └─────────┘   │
+├─────────────────────────────────────────┤
+│ Footer                                  │
+└─────────────────────────────────────────┘
+```
+
+#### Nav 導覽列
+```css
+/* Container */
+height: 64px;
+padding: 0 var(--space-6);
+background: var(--surface-primary);
+border-bottom: 1px solid var(--gray-200);
+display: flex;
+align-items: center;
+justify-content: space-between;
+
+/* Logo */
+font-size: var(--text-2xl);
+font-weight: var(--font-bold);
+color: var(--primary-500);
+
+/* Auth Buttons (未登入狀態) */
+display: flex;
+gap: var(--space-3);
+
+/* 「登入」按鈕：Secondary Button 樣式 */
+/* 「註冊」按鈕：Primary Button 樣式 */
+
+/* Go to Map Button (已登入狀態) */
+/* Primary Button 樣式 */
+```
+
+#### Hero Section
+```css
+/* Container */
+min-height: 80vh;
+display: flex;
+flex-direction: column;
+align-items: center;
+justify-content: center;
+text-align: center;
+padding: var(--space-20) var(--space-6);
+background: linear-gradient(
+  135deg,
+  var(--primary-50) 0%,
+  var(--bg-primary) 100%
+);
+
+/* Main Title */
+font-size: var(--text-4xl);   /* 36px */
+font-weight: var(--font-bold);
+color: var(--gray-900);
+letter-spacing: var(--tracking-tight);
+line-height: var(--leading-tight);
+margin-bottom: var(--space-6);
+
+/* Mobile Title */
+@media (max-width: 767px) {
+  font-size: var(--text-3xl);   /* 30px */
+}
+
+/* Subtitle */
+font-size: var(--text-xl);    /* 20px */
+color: var(--gray-500);
+max-width: 600px;
+line-height: var(--leading-relaxed);
+margin-bottom: var(--space-10);
+
+/* CTA Button */
+/* Large Primary Button 樣式 */
+padding: 16px 40px;
+font-size: var(--text-lg);
+border-radius: var(--radius-md);
+box-shadow: var(--shadow-lg);
+```
+
+#### Feature Section
+```css
+/* Container */
+padding: var(--space-24) var(--space-6);
+background: var(--bg-secondary);
+
+/* Section Title */
+font-size: var(--text-3xl);
+font-weight: var(--font-bold);
+color: var(--gray-900);
+text-align: center;
+margin-bottom: var(--space-16);
+
+/* Feature Grid */
+display: grid;
+grid-template-columns: repeat(3, 1fr);
+gap: var(--space-8);
+max-width: 1200px;
+margin: 0 auto;
+
+/* Mobile */
+@media (max-width: 767px) {
+  grid-template-columns: 1fr;
+}
+
+/* Feature Card */
+background: var(--surface-primary);
+border-radius: var(--radius-lg);
+padding: var(--space-8);
+box-shadow: var(--shadow-sm);
+text-align: center;
+transition: all var(--duration-normal) var(--ease-out);
+
+/* Feature Card Hover */
+box-shadow: var(--shadow-md);
+transform: translateY(-4px);
+
+/* Feature Icon */
+width: 48px;
+height: 48px;
+color: var(--primary-500);
+margin: 0 auto var(--space-4);
+
+/* Feature Title */
+font-size: var(--text-xl);
+font-weight: var(--font-semibold);
+color: var(--gray-900);
+margin-bottom: var(--space-3);
+
+/* Feature Description */
+font-size: var(--text-base);
+color: var(--gray-500);
+line-height: var(--leading-relaxed);
+```
+
+#### Footer
+```css
+/* Container */
+padding: var(--space-8) var(--space-6);
+background: var(--gray-900);
+color: var(--gray-400);
+
+/* Content */
+max-width: 1200px;
+margin: 0 auto;
+display: flex;
+justify-content: space-between;
+align-items: center;
+
+/* Copyright */
+font-size: var(--text-sm);
+
+/* Links */
+display: flex;
+gap: var(--space-6);
+font-size: var(--text-sm);
+
+/* Link Hover */
+color: var(--gray-200);
+```
+
+---
+
+### 3.7 Profile Page 個人中心（/profile）
+
+#### Layout Structure 佈局結構
+```
+┌─────────────────────────────────────────┐
+│ Header (64px) ← 返回地圖  個人中心     │
+├─────────────────────────────────────────┤
+│                                         │
+│ Content (max-width: 800px, centered)    │
+│                                         │
+│ ┌─────────────────────────────────────┐ │
+│ │ User Info Card                      │ │
+│ │ 頭像佔位 | Email | 加入日期         │ │
+│ └─────────────────────────────────────┘ │
+│                                         │
+│ ┌─────────────────────────────────────┐ │
+│ │ My Trips Section                    │ │
+│ │ 旅程卡片列表                        │ │
+│ └─────────────────────────────────────┘ │
+│                                         │
+│ ┌─────────────────────────────────────┐ │
+│ │ Data Management                     │ │
+│ │ [匯出資料]   [登出]                 │ │
+│ └─────────────────────────────────────┘ │
+│                                         │
+└─────────────────────────────────────────┘
+```
+
+#### Header 頁首
+```css
+/* Container */
+height: 64px;
+padding: 0 var(--space-6);
+background: var(--surface-primary);
+border-bottom: 1px solid var(--gray-200);
+display: flex;
+align-items: center;
+gap: var(--space-4);
+
+/* Back Button */
+display: flex;
+align-items: center;
+gap: var(--space-2);
+color: var(--gray-600);
+font-size: var(--text-sm);
+font-weight: var(--font-medium);
+cursor: pointer;
+transition: color var(--duration-fast) var(--ease-out);
+/* Icon: ChevronLeft, 20px */
+
+/* Back Button Hover */
+color: var(--primary-500);
+
+/* Page Title */
+font-size: var(--text-xl);
+font-weight: var(--font-semibold);
+color: var(--gray-900);
+```
+
+#### Content Area 內容區域
+```css
+/* Container */
+padding: var(--space-8) var(--space-6);
+max-width: 800px;
+margin: 0 auto;
+display: flex;
+flex-direction: column;
+gap: var(--space-8);
+```
+
+#### User Info Card 用戶資料卡片
+```css
+/* Container */
+background: var(--surface-primary);
+border-radius: var(--radius-lg);
+padding: var(--space-6);
+box-shadow: var(--shadow-sm);
+display: flex;
+align-items: center;
+gap: var(--space-6);
+
+/* Avatar Placeholder */
+width: 64px;
+height: 64px;
+border-radius: var(--radius-full);
+background: var(--primary-100);
+color: var(--primary-700);
+display: flex;
+align-items: center;
+justify-content: center;
+font-size: var(--text-2xl);
+font-weight: var(--font-bold);
+flex-shrink: 0;
+
+/* User Email */
+font-size: var(--text-lg);
+font-weight: var(--font-semibold);
+color: var(--gray-900);
+
+/* Join Date */
+font-size: var(--text-sm);
+color: var(--gray-500);
+margin-top: var(--space-1);
+```
+
+#### My Trips Section 我的旅程區塊
+```css
+/* Section Title */
+font-size: var(--text-xl);
+font-weight: var(--font-semibold);
+color: var(--gray-900);
+margin-bottom: var(--space-4);
+
+/* Trip Card (Profile 版本) */
+background: var(--surface-primary);
+border-radius: var(--radius-md);
+padding: var(--space-4) var(--space-5);
+box-shadow: var(--shadow-xs);
+display: flex;
+align-items: center;
+justify-content: space-between;
+cursor: pointer;
+transition: all var(--duration-fast) var(--ease-out);
+margin-bottom: var(--space-3);
+
+/* Trip Card Hover */
+background: var(--primary-50);
+box-shadow: var(--shadow-sm);
+transform: translateX(4px);
+
+/* Trip Name */
+font-size: var(--text-base);
+font-weight: var(--font-semibold);
+color: var(--gray-900);
+
+/* Trip Meta (地點數 + 日期範圍) */
+font-size: var(--text-sm);
+color: var(--gray-500);
+margin-top: var(--space-1);
+
+/* Arrow Icon */
+width: 20px;
+height: 20px;
+color: var(--gray-400);
+/* Icon: ChevronRight */
+
+/* Empty State */
+text-align: center;
+padding: var(--space-12);
+color: var(--gray-400);
+font-size: var(--text-base);
+```
+
+#### Data Management 資料管理區塊
+```css
+/* Container */
+background: var(--surface-primary);
+border-radius: var(--radius-lg);
+padding: var(--space-6);
+box-shadow: var(--shadow-sm);
+
+/* Section Title */
+font-size: var(--text-xl);
+font-weight: var(--font-semibold);
+color: var(--gray-900);
+margin-bottom: var(--space-6);
+
+/* Button Row */
+display: flex;
+gap: var(--space-4);
+flex-wrap: wrap;
+
+/* Export Button：Secondary Button 樣式 */
+/* Logout Button：Danger Button 樣式 */
+```
 
 ---
 
